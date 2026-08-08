@@ -1,8 +1,21 @@
 #!/usr/bin/env node
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { add, build, init, listEntries, serve } from './core/commands.js';
 import { KIND_ORDER } from './core/types.js';
-const VERSION = '0.1.0';
+function readPackageVersion() {
+    // A copied constant drifted as releases shipped, so the installed package
+    // manifest is the single source of truth for CLI output and help text.
+    const metadata = createRequire(import.meta.url)('../package.json');
+    const version = typeof metadata === 'object' && metadata !== null && 'version' in metadata
+        ? metadata.version
+        : undefined;
+    if (typeof version !== 'string' || version.length === 0) {
+        throw new Error('Invalid package metadata: expected a non-empty version');
+    }
+    return version;
+}
+const VERSION = readPackageVersion();
 function parseArgs(args) {
     const command = args[0] ?? '';
     const positional = [];

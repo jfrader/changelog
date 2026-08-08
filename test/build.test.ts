@@ -3,13 +3,131 @@ import assert from 'node:assert/strict';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import vm from 'node:vm';
 import { init, add, build, listEntries } from '../src/core/commands.ts';
 import { findProject } from '../src/core/project.ts';
 import { renderPage } from '../src/ui/page.ts';
 import { renderMarkdown } from '../src/core/render-md.ts';
+import type { ChangelogDocument } from '../src/core/types.ts';
 
 async function makeRoot(): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), 'changelog-test-'));
+}
+
+class PageElement {
+  textContent = '';
+  innerHTML = '';
+  className = '';
+  value = '';
+  placeholder = '';
+  dataset: Record<string, string> = {};
+  children: PageElement[] = [];
+  style = { setProperty: (_name: string, _value: string) => undefined };
+  private readonly attributes = new Map<string, string>();
+
+  appendChild(child: PageElement): PageElement {
+    this.children.push(child);
+    return child;
+  }
+
+  addEventListener(): void {}
+
+  setAttribute(name: string, value: string): void {
+    this.attributes.set(name, value);
+  }
+
+  getAttribute(name: string): string | null {
+    return this.attributes.get(name) ?? null;
+  }
+
+  removeAttribute(name: string): void {
+    this.attributes.delete(name);
+  }
+}
+
+function runStandalonePage(
+  document: ChangelogDocument,
+  browserLanguages: string[] = ['en'],
+): { content: string; pageTitle: string } {
+  const page = renderPage(document);
+  const dataSource = page.match(
+    /<script type="application\/json" id="changelog-data">([\s\S]*?)<\/script>/u,
+  )?.[1];
+  const scripts = [...page.matchAll(/<script(?: [^>]*)?>([\s\S]*?)<\/script>/gu)];
+  const runtime = scripts.at(-1)?.[1];
+  assert.ok(dataSource);
+  assert.ok(runtime);
+
+  const elements = new Map<string, PageElement>();
+  for (const id of [
+    'changelog-data',
+    'content',
+    'filters',
+    'hero-eyebrow',
+    'page-title',
+    'search',
+    'page-footer',
+    'langs',
+    'summary',
+    'theme-toggle',
+  ]) {
+    elements.set(id, new PageElement());
+  }
+  elements.get('changelog-data')!.textContent = dataSource;
+
+  const documentElement = new PageElement();
+  const browserDocument = {
+    documentElement,
+    getElementById: (id: string) => elements.get(id),
+    createElement: () => new PageElement(),
+    createTextNode: (text: string) => Object.assign(new PageElement(), { textContent: text }),
+  };
+
+  vm.runInNewContext(runtime, {
+    document: browserDocument,
+    getComputedStyle: () => ({ getPropertyValue: () => '#000000' }),
+    localStorage: { getItem: () => null, setItem: () => undefined },
+    navigator: { language: browserLanguages.at(-1) ?? 'en', languages: browserLanguages },
+    URL,
+    window: { matchMedia: () => ({ matches: false }) },
+  });
+
+  return {
+    content: elements.get('content')!.innerHTML,
+    pageTitle: elements.get('page-title')!.textContent,
+  };
+}
+
+function standaloneDocument(
+  entry: Partial<ChangelogDocument['entries'][number]>,
+): ChangelogDocument {
+  return {
+    schema: 1,
+    product: 'x',
+    productName: 'X',
+    tagline: 't',
+    accent: '#000000',
+    generatedAt: '2026-08-08T00:00:00.000Z',
+    languages: ['en'],
+    defaultLanguage: 'en',
+    entries: [
+      {
+        id: 'safe-rendering',
+        kind: 'fix',
+        title: 'Safe rendering',
+        body: '',
+        date: '2026-08-08',
+        product: 'x',
+        productName: 'X',
+        tags: [],
+        audience: 'all',
+        published: true,
+        fileName: 'safe-rendering.md',
+        relPath: 'entries/safe-rendering.md',
+        ...entry,
+      },
+    ],
+  };
 }
 
 test('full init → add → build → serve-less flow', async () => {
@@ -121,6 +239,52 @@ test('renderPage embeds JSON safely', async () => {
   const html = renderPage(document);
   assert.ok(!html.includes('</script><script>alert'), 'script tag must be escaped in embedded JSON');
   assert.ok(html.includes('<\\/script>'));
+});
+
+test('standalone page sanitizes markdown link destinations', () => {
+  const { content } = runStandalonePage(
+    standaloneDocument({
+      body: [
+        '[Safe](https://example.test/docs)',
+        '[Attribute](https://example.test/" autofocus onfocus="alert)',
+        '[Script](javascript:alert)',
+        '[Data](data:text/html,boom)',
+      ].join(' '),
+    }),
+  );
+  assert.match(content, /<a href="https:\/\/example\.test\/docs"/u);
+  assert.ok(
+    !content.includes('href="https://example.test/" autofocus onfocus="alert"'),
+    'quotes in destinations must stay inside the href attribute',
+  );
+  assert.match(
+    content,
+    /href="https:\/\/example\.test\/&quot; autofocus onfocus=&quot;alert"/u,
+  );
+  assert.ok(!content.includes('<a href="javascript:'), 'script URLs must render without a link');
+  assert.ok(!content.includes('<a href="data:'), 'data URLs must render without a link');
+});
+
+test('standalone page escapes entry versions before rendering', () => {
+  const { content } = runStandalonePage(
+    standaloneDocument({ version: '1.1.3</span><img src=x onerror=alert(1)>' }),
+  );
+  assert.ok(!content.includes('<img'), 'version metadata must not create HTML elements');
+  assert.match(content, /v1\.1\.3&lt;\/span&gt;&lt;img src=x onerror=alert\(1\)&gt;/u);
+});
+
+test('standalone page follows the first supported ordered browser language', () => {
+  const document = standaloneDocument({
+    languages: ['en', 'es'],
+    titleByLang: { en: 'Safe rendering', es: 'Contenido seguro' },
+    bodyByLang: { en: '', es: '' },
+  });
+  document.languages = ['en', 'es'];
+
+  const rendered = runStandalonePage(document, ['fr-FR', 'es-AR', 'en-US']);
+
+  assert.equal(rendered.pageTitle, 'Novedades');
+  assert.match(rendered.content, /Contenido seguro/u);
 });
 
 test('renderMarkdown groups by date newest first', () => {

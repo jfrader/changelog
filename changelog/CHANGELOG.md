@@ -2,7 +2,7 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 08 Aug 2026 15:20:22 GMT from 5 entries._
+_Generated Sat, 08 Aug 2026 16:12:44 GMT from 7 entries._
 
 ## 2026-08-08
 
@@ -13,6 +13,20 @@ _Fix · 1.1.2 · `sdk` `browser`_
 Use the storage-backed SDK helpers to keep later same-day entries visible
 without replaying old news, even when upgrading from date-only state. What's
 New and generated pages remain usable when browser storage is blocked.
+
+### Standalone pages render entry content safely
+
+_Fix · 1.1.3 · `page` `security`_
+
+Standalone changelog pages now keep malformed link destinations and version
+labels from changing the page markup or opening active URL schemes.
+
+### Pages choose your preferred supported language
+
+_Fix · 1.1.3 · `page` `i18n`_
+
+Standalone changelog pages now follow the first supported language in your
+browser's ordered preferences instead of considering only one browser locale.
 
 ### Multilingual entries
 

@@ -316,14 +316,45 @@ const JS = `
   }
 
   // ---- tiny safe markdown renderer ----
+  const esc = (s) => String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
   function md(text) {
-    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const inline = (s) =>
+    const safeLinkDestination = (raw) => {
+      const destination = raw.trim();
+      // Entry markdown reaches innerHTML, so malformed or active URL schemes
+      // must never become browser navigation targets.
+      if (!destination || /[\\u0000-\\u001f\\u007f]/u.test(destination)) return null;
+      try {
+        const protocol = new URL(destination, 'https://changelog.invalid/').protocol;
+        if (!['http:', 'https:', 'mailto:'].includes(protocol)) return null;
+        return destination;
+      } catch {
+        return null;
+      }
+    };
+    const formatText = (s) =>
       esc(s)
-        .replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
         .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>')
         .replace(/\\*([^*]+)\\*/g, '<em>$1</em>')
         .replace(/\`([^\`]+)\`/g, '<code>$1</code>');
+    const inline = (s) => {
+      let html = '';
+      let cursor = 0;
+      for (const match of s.matchAll(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g)) {
+        html += formatText(s.slice(cursor, match.index));
+        const label = formatText(match[1]);
+        const destination = safeLinkDestination(match[2]);
+        html += destination
+          ? '<a href="' + esc(destination) + '" target="_blank" rel="noopener">' + label + '</a>'
+          : label;
+        cursor = match.index + match[0].length;
+      }
+      return html + formatText(s.slice(cursor));
+    };
     const blocks = text.split(/\\n\\n+/);
     return blocks.map((block) => {
       const trimmed = block.trim();
@@ -437,7 +468,7 @@ const JS = `
         const loc = localizeEntry(e);
         const isNew = e.id === latestFeatureId;
         const badges = (e.tags || []).map((t) => '<span class="tag">' + t.replace(/</g, '&lt;') + '</span>').join('');
-        const version = e.version ? '<span class="tag">v' + e.version + '</span>' : '';
+        const version = e.version ? '<span class="tag">v' + esc(e.version) + '</span>' : '';
         const audience = e.audience && e.audience !== 'all' ? '<span class="audience">' + e.audience + '</span>' : '';
         html += '<article class="card is-' + e.kind + '">';
         html += '<div class="card-head"><span class="badge">' + kindLabel(e.kind) + '</span>';
