@@ -15,6 +15,10 @@
   improvement, fix, or breaking change as an entry in `changelog/entries/`
   (one markdown file per change, `YYYY-MM-DD--slug.md`), committed with the
   change it describes.
+- Write entries only for what end users can see, use, or feel. Never log
+  internal tools, admin consoles, refactors, dependency bumps, test-only work,
+  or backend/config changes with no observable user impact. If a user would
+  notice nothing between before and after, there is no entry.
 - Scaffold entries with `node dist/cli.js add --title "..." --kind ...` and
   fill the body with brief, literal end-user copy. Never invent an entry.
 - Run `node dist/cli.js build` before shipping so `changelog/CHANGELOG.md`,

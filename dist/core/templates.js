@@ -93,6 +93,29 @@ Rules:
 - \`kind\` and \`date\` are required; a bad entry fails the build with a clear
   message and is skipped with a warning otherwise.
 
+### What does NOT get an entry
+
+The changelog is for **end users**, so skip anything they cannot see, use, or
+feel. Do not write entries for:
+
+- **Internal tools and developer surfaces** — admin consoles, CLI tools,
+  maintenance scripts, CI/deploy pipelines, dev-only features.
+- **Refactors** with no user-visible behavior change, and dead-code removal.
+- **Dependency bumps and library upgrades** with no observable effect on users.
+- **Test-only work** — new tests, test infrastructure, fixtures.
+- **Backend or performance changes with no observable impact** — internal data
+  migrations, schema changes, queue/worker plumbing, caching that changes
+  nothing the user notices.
+- **Documentation-only changes** and internal docs.
+- **Build/config changes invisible to end users** (Dockerfiles, environment
+  wiring, lint/format configuration).
+
+The test question: *"If a user used the product before this change and after
+it, would they notice anything?"* If the honest answer is "no" (or "only
+during development"), there is no entry. When in doubt, leave it out — a
+missing entry is a non-event, a junk entry misleads users. Exceptions require
+an explicit user request to log an internal change.
+
 ### i18n (multi-language projects)
 
 - \`config.json\` lists the supported codes (\`languages\`) and which one is the
@@ -199,10 +222,23 @@ Write exactly one entry per **end-user-visible** change:
 - A fix for something a user could observe misbehaving.
 - A meaningful improvement or a breaking change.
 
-Do **not** write entries for: refactors with no user-visible effect, internal
-tooling, dependency bumps, or test-only work — unless the user asks for it.
-Never invent an entry; if unsure whether a change is user-visible, treat it as
-internal and skip it.
+Do **not** write entries for:
+
+- **Internal tools and developer surfaces**: admin consoles, CLI tools,
+  maintenance scripts, CI/deploy pipelines, dev-only features.
+- **Refactors** and dead-code removal with no user-visible behavior change.
+- **Dependency bumps** and library upgrades with no observable effect.
+- **Test-only work** (tests, fixtures, test infrastructure).
+- **Backend/performance work with no observable impact**: internal migrations,
+  schema changes, queue/worker plumbing, caching that changes nothing the user
+  notices.
+- **Documentation-only or build/config changes** invisible to end users.
+
+The test question: *"Would a user notice anything between before and after?"*
+If the honest answer is "no" (or "only during development"), there is no
+entry. When in doubt, leave it out — a missing entry is a non-event; a junk
+entry misleads users. Exceptions require an explicit user request to log an
+internal change. Never invent an entry.
 
 ## Workflow
 
@@ -266,6 +302,10 @@ export const AGENTS_SNIPPET_TEMPLATE = `## Changelog
 - Record every end-user-visible feature, improvement, fix, or breaking change
   as a changelog entry in \`changelog/entries/\` (one markdown file per change,
   \`YYYY-MM-DD--slug.md\`), committed with the change it describes.
+- Write entries only for what end users can see, use, or feel. Never log
+  internal tools, admin consoles, refactors, dependency bumps, test-only work,
+  or backend/config changes with no observable user impact. If a user would
+  notice nothing between before and after, there is no entry.
 - Scaffold entries with \`changelog add\` (from this repo root) and fill the
   body with brief, literal end-user copy. Never invent an entry.
 - Write copy in every language the product ships: per-language titles as

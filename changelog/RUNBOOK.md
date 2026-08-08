@@ -17,16 +17,21 @@ Each entry is one file: `entries/YYYY-MM-DD--short-slug.md`.
 ---
 kind: feature            # feature | improvement | fix | breaking | chore
 date: 2026-08-07
-title: "What changed"
+title: "What changed"     # default-language title
+title.es: "Qué cambió"    # optional: title for another configured language
 tags: [match, replay]
 audience: all            # all | player | manager | guest | admin
 version: 0.1.0           # optional
 published: true          # false = draft, excluded from builds
 ---
 
-# What changed
+## en
 
-End-user copy: 1–3 short sentences. Literal and helpful.
+End-user copy in the default language: 1–3 short sentences.
+
+## es
+
+Copy para usuarios en español: 1–3 oraciones cortas.
 ```
 
 Rules:
@@ -38,6 +43,43 @@ Rules:
   obvious (matching each product's writing style).
 - `kind` and `date` are required; a bad entry fails the build with a clear
   message and is skipped with a warning otherwise.
+
+### What does NOT get an entry
+
+The changelog is for **end users**, so skip anything they cannot see, use, or
+feel. Do not write entries for:
+
+- **Internal tools and developer surfaces** — admin consoles, CLI tools,
+  maintenance scripts, CI/deploy pipelines, dev-only features.
+- **Refactors** with no user-visible behavior change, and dead-code removal.
+- **Dependency bumps and library upgrades** with no observable effect on users.
+- **Test-only work** — new tests, test infrastructure, fixtures.
+- **Backend or performance changes with no observable impact** — internal data
+  migrations, schema changes, queue/worker plumbing, caching that changes
+  nothing the user notices.
+- **Documentation-only changes** and internal docs.
+- **Build/config changes invisible to end users** (Dockerfiles, environment
+  wiring, lint/format configuration).
+
+The test question: *"If a user used the product before this change and after
+it, would they notice anything?"* If the honest answer is "no" (or "only
+during development"), there is no entry. When in doubt, leave it out — a
+missing entry is a non-event, a junk entry misleads users. Exceptions require
+an explicit user request to log an internal change.
+
+### i18n (multi-language projects)
+
+- `config.json` lists the supported codes (`languages`) and which one is the
+  `defaultLanguage`. Unmarked content and legacy entries belong to the
+  default language.
+- Per-language titles live in frontmatter: `title.en`, `title.es`, …
+  (the plain `title` key is the default language).
+- Per-language bodies live in the body under `## <code>` headings. The default
+  language may be the first unmarked section for a single-language entry.
+- The end-user page and the `localize` SDK helper pick the reader's language
+  and fall back to the default language when a language lacks content.
+- Single-language entries (no `title.<lang>`, no `## <code>` sections) keep
+  working unchanged and are treated as default-language content.
 
 ## 2. Add an entry
 

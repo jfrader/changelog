@@ -1,6 +1,6 @@
 {
   "name": "@jfrader/changelog",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Zero-dependency changelog system: markdown entries, an agent-facing MD workflow, a build that emits CHANGELOG.md + JSON, and a self-contained end-user page served by a tiny backend.",
   "type": "module",
   "license": "MIT",

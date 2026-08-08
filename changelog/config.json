@@ -3,11 +3,11 @@
   "productName": "changelog",
   "tagline": "What is new in the changelog tool",
   "accent": "#8b5cf6",
-  "entryDir": "entries",
-  "outDir": ".",
   "languages": [
     "en",
     "es"
   ],
-  "defaultLanguage": "en"
+  "defaultLanguage": "en",
+  "entryDir": "entries",
+  "outDir": "."
 }

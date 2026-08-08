@@ -13,10 +13,23 @@ Write exactly one entry per **end-user-visible** change:
 - A fix for something a user could observe misbehaving.
 - A meaningful improvement or a breaking change.
 
-Do **not** write entries for: refactors with no user-visible effect, internal
-tooling, dependency bumps, or test-only work — unless the user asks for it.
-Never invent an entry; if unsure whether a change is user-visible, treat it as
-internal and skip it.
+Do **not** write entries for:
+
+- **Internal tools and developer surfaces**: admin consoles, CLI tools,
+  maintenance scripts, CI/deploy pipelines, dev-only features.
+- **Refactors** and dead-code removal with no user-visible behavior change.
+- **Dependency bumps** and library upgrades with no observable effect.
+- **Test-only work** (tests, fixtures, test infrastructure).
+- **Backend/performance work with no observable impact**: internal migrations,
+  schema changes, queue/worker plumbing, caching that changes nothing the user
+  notices.
+- **Documentation-only or build/config changes** invisible to end users.
+
+The test question: *"Would a user notice anything between before and after?"*
+If the honest answer is "no" (or "only during development"), there is no
+entry. When in doubt, leave it out — a missing entry is a non-event; a junk
+entry misleads users. Exceptions require an explicit user request to log an
+internal change. Never invent an entry.
 
 ## Workflow
 
@@ -36,19 +49,32 @@ internal and skip it.
 ---
 kind: feature            # feature | improvement | fix | breaking | chore
 date: YYYY-MM-DD
-title: "Short title"
+title: "Short title"     # default language
+title.es: "Título corto" # optional per-language title
 tags: [optional, tags]
 audience: all
 published: true          # false keeps a draft out of builds
 ---
 
-# Short title
+## en
 
 One to three short, literal sentences for end users.
+
+## es
+
+Una a tres oraciones cortas y literales para los usuarios.
 ```
 
 Required: `kind`, `date`, and a title. Broken entries are reported and
 skipped by the build; fix them before shipping.
+
+### i18n
+
+Write entries in every language the product ships (`config.json` →
+`languages`): per-language titles as `title.<code>`, per-language bodies
+under `## <code>` headings. The default language is the one unmarked/legacy
+content belongs to; the page and the SDK fall back to it when a language is
+missing.
 
 ## Commands
 
