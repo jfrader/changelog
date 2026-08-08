@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output is COMMITTED so the package works when installed via git
+# (yarn 1 does not run lifecycle scripts for git dependencies). Rebuild with
+# `npm run build` before committing when src/ changes.
+# dist/
+
 *.tsbuildinfo
 
 # Logs
