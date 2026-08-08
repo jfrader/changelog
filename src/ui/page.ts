@@ -279,9 +279,19 @@ const JS = `
   function detectLanguage() {
     const saved = readPreference('changelog-lang');
     if (saved && LANGUAGES.includes(saved)) return saved;
-    const nav = String(navigator.language || DEFAULT_LANG).toLowerCase();
-    for (const l of LANGUAGES) {
-      if (nav === l || nav.startsWith(l + '-')) return l;
+    // Prefer the browser's ordered language list, then navigator.language.
+    const prefs = [];
+    try {
+      if (Array.isArray(navigator.languages)) prefs.push(...navigator.languages.map((x) => String(x).toLowerCase()));
+      if (navigator.language) prefs.push(String(navigator.language).toLowerCase());
+    } catch {
+      // navigator may be restricted under some browser policies.
+    }
+    if (!prefs.length) prefs.push(DEFAULT_LANG);
+    for (const nav of prefs) {
+      for (const l of LANGUAGES) {
+        if (nav === l || nav.startsWith(l + '-')) return l;
+      }
     }
     return DEFAULT_LANG;
   }
