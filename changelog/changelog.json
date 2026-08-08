@@ -9,7 +9,7 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-08-08T03:14:31.698Z",
+  "generatedAt": "2026-08-08T14:37:05.302Z",
   "entries": [
     {
       "id": "2026-08-08--multilingual-entries",
@@ -39,6 +39,36 @@
       "published": true,
       "fileName": "2026-08-08--multilingual-entries.md",
       "relPath": "entries/2026-08-08--multilingual-entries.md"
+    },
+    {
+      "id": "2026-08-08--install-from-either-registry",
+      "kind": "improvement",
+      "title": "Install from either registry",
+      "body": "Install `@jfrader/changelog` from npmjs or GitHub Packages. Both registries\nreceive the same verified release artifact.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "en": "Install from either registry",
+        "es": "Instalalo desde cualquiera de los dos registros"
+      },
+      "bodyByLang": {
+        "en": "Install `@jfrader/changelog` from npmjs or GitHub Packages. Both registries\nreceive the same verified release artifact.",
+        "es": "Instalá `@jfrader/changelog` desde npmjs o GitHub Packages. Los dos registros\nreciben exactamente el mismo artefacto verificado."
+      },
+      "date": "2026-08-08",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.1.2",
+      "tags": [
+        "package",
+        "distribution"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-08--install-from-either-registry.md",
+      "relPath": "entries/2026-08-08--install-from-either-registry.md"
     },
     {
       "id": "2026-08-07--first-public-release",

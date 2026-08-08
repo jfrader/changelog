@@ -143,6 +143,18 @@ npm test          # node test runner (tsx)
 npm run build     # tsc -> dist
 ```
 
+## Publishing
+
+Push an annotated `v<package-version>` tag from `main`. The release workflow
+checks the tag and lockfile, builds and tests once, packs one immutable tarball,
+then verifies or publishes that exact artifact to npmjs and GitHub Packages.
+Retries are safe: an existing matching artifact is accepted, while a different
+artifact at the same version fails the release.
+
+The npmjs package uses a trusted publisher for
+`jfrader/changelog` → `.github/workflows/publish.yml`; GitHub Packages uses the
+workflow's scoped `GITHUB_TOKEN`.
+
 The CLI entry is `dist/cli.js`; the public API is exported from `dist/index.js`
 so CI and in-app "What's new" panels can reuse the same parsing and build logic.
 
