@@ -36,6 +36,22 @@ npx changelog serve --port 4567
 The CLI walks up from the current directory to find `changelog/`, so you can
 run it from anywhere inside the repository.
 
+### Registry choice
+
+npmjs is the zero-configuration default. GitHub Packages carries the same
+verified tarball, but GitHub requires authentication even for public npm
+packages:
+
+```ini
+@jfrader:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+Registry selection applies to the whole `@jfrader` scope; npm does not fall
+back from GitHub Packages to npmjs. Projects that map that scope to GitHub must
+authenticate there or use an explicit npmjs tarball URL for a package that is
+not mirrored.
+
 ## Entry format
 
 Each entry is `changelog/entries/YYYY-MM-DD--short-slug.md`:
@@ -90,7 +106,7 @@ It includes:
 | `/changelog.json` | machine-readable feed |
 | `/api/entries` | JSON API (same feed) |
 | `/api/health` | health probe |
-| `/entries/<file>.md` | raw entry markdown (read-only) |
+| `/entries/<file>.md` | raw published-entry markdown (read-only) |
 
 It is read-only by design: entries change in git, get built, then get served.
 
@@ -100,23 +116,25 @@ Import the browser-safe SDK from any web app:
 
 ```ts
 import {
-  computeWhatsNew,
-  markSeen,
-  readSeenDate,
-  DEFAULT_SEEN_KEY,
+  computeWhatsNewFromStorage,
+  markWhatsNewSeen,
 } from "@jfrader/changelog/sdk";
 import changelogData from "./changelog.json"; // from `changelog build`
 
-const lastSeen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
-const { entries, hasNew } = computeWhatsNew(changelogData.entries, lastSeen);
+const { entries, hasNew } = computeWhatsNewFromStorage(
+  changelogData.entries,
+  () => window.localStorage,
+);
 
 // When the player dismisses the modal:
-markSeen(window.localStorage, entries, DEFAULT_SEEN_KEY);
+markWhatsNewSeen(() => window.localStorage, entries);
 ```
 
 The SDK has no Node or DOM dependencies — only a tiny storage interface — so
-it works in React, Vue, Svelte, or vanilla JS. You render the modal shell in
-your own UI and design tokens.
+it works in React, Vue, Svelte, or vanilla JS. The storage-backed helpers keep
+separate same-day releases visible and tolerate unavailable browser storage.
+In SSR apps, call them after the component mounts. You render the modal shell
+in your own UI and design tokens.
 
 ## Examples
 
@@ -154,6 +172,10 @@ artifact at the same version fails the release.
 The npmjs package uses a trusted publisher for
 `jfrader/changelog` → `.github/workflows/publish.yml`; GitHub Packages uses the
 workflow's scoped `GITHUB_TOKEN`.
+
+GitHub creates a personal package as private on its first publication. After
+the first workflow succeeds, make it public once from the package's **Package
+settings → Danger Zone → Change visibility**. Later versions keep that setting.
 
 The CLI entry is `dist/cli.js`; the public API is exported from `dist/index.js`
 so CI and in-app "What's new" panels can reuse the same parsing and build logic.

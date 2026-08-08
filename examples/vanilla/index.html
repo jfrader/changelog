@@ -122,9 +122,9 @@
        this would be `import ... from "@jfrader/changelog/sdk";` -->
   <script type="module">
     import {
-      computeWhatsNew,
+      computeWhatsNewFromStorage,
       localize,
-      markSeen,
+      markWhatsNewSeen,
       readSeenDate,
       DEFAULT_SEEN_KEY,
     } from "../../dist/sdk/index.js";
@@ -186,13 +186,18 @@
 
     function dismiss() {
       // Persist "seen" so the modal does not reappear until newer entries land.
-      markSeen(window.localStorage, newEntries, DEFAULT_SEEN_KEY);
+      markWhatsNewSeen(() => window.localStorage, newEntries);
       dialog.close();
       refreshSeenNote();
     }
 
     function refreshSeenNote() {
-      const seen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
+      let seen = null;
+      try {
+        seen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
+      } catch {
+        // The demo remains usable when browser policy blocks storage.
+      }
       seenNote.textContent = seen
         ? `Last seen changelog date: ${seen} (localStorage "${DEFAULT_SEEN_KEY}") — the button browses the full changelog.`
         : "Nothing seen yet — the modal opens on load.";
@@ -203,8 +208,10 @@
       const changelog = await response.json();
 
       allEntries = changelog.entries.filter((entry) => entry.published !== false);
-      const lastSeen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
-      const { entries, hasNew } = computeWhatsNew(allEntries, lastSeen);
+      const { entries, hasNew } = computeWhatsNewFromStorage(
+        allEntries,
+        () => window.localStorage,
+      );
       newEntries = entries;
       refreshSeenNote();
 

@@ -11,6 +11,6 @@ export { findProject, loadConfig, writeConfig, DEFAULT_CONFIG, CONFIG_FILE, } fr
 export { renderMarkdown, } from './core/render-md.js';
 export { renderPage, escapeHtml, } from './ui/page.js';
 export { startServer } from './server/server.js';
-export { computeWhatsNew, entriesSince, localize, localToday, markSeen, markSeenToday, readSeenDate, shouldShowWhatsNew, writeSeenDate, DEFAULT_SEEN_KEY, } from './sdk/seen.js';
+export { computeWhatsNew, computeWhatsNewFromStorage, entriesSince, localize, localToday, markSeen, markWhatsNewSeen, markSeenToday, readSeenDate, shouldShowWhatsNew, writeSeenDate, DEFAULT_SEEN_KEY, DEFAULT_SEEN_IDS_KEY, } from './sdk/seen.js';
 export { KIND_ORDER, AUDIENCES, } from './core/types.js';
 //# sourceMappingURL=index.js.map

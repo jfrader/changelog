@@ -13,15 +13,14 @@
  *      seen date, and "Got it" marks them seen so it stays closed until the
  *      next release adds entries.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import changelogData from "../vanilla/changelog.json";
 import {
-  computeWhatsNew,
+  computeWhatsNewFromStorage,
   localize,
-  markSeen,
-  readSeenDate,
-  DEFAULT_SEEN_KEY,
+  markWhatsNewSeen,
   type ChangelogDocument,
+  type ChangelogEntry,
 } from "@jfrader/changelog/sdk";
 
 // Vite/TS: generated JSON is typed literally; the generator guarantees the
@@ -45,27 +44,31 @@ const KIND_COLOR: Record<string, string> = {
 };
 
 export function WhatsNewModal({ language }: { language?: string }) {
-  const [open, setOpen] = useState(false);
-  const lang = language ?? String(navigator.language || "en").startsWith("es") ? "es" : "en";
-
-  // Compute "new since last visit" once per app build.
-  const { entries, hasNew } = useMemo(() => {
-    const lastSeen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
-    return computeWhatsNew(changelogDocument.entries, lastSeen);
-    // The bundled changelog is fixed for the life of this app build.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [state, setState] = useState<{ open: boolean; entries: ChangelogEntry[] }>({
+    open: false,
+    entries: [],
+  });
+  const lang =
+    language ??
+    (typeof navigator !== "undefined" && String(navigator.language).startsWith("es")
+      ? "es"
+      : "en");
 
   useEffect(() => {
-    if (hasNew) setOpen(true);
-  }, [hasNew]);
+    // Deferring browser state until mount keeps the server and hydration markup identical.
+    const next = computeWhatsNewFromStorage(
+      changelogDocument.entries,
+      () => window.localStorage,
+    );
+    setState({ open: next.hasNew, entries: next.entries });
+  }, []);
 
-  const dismiss = useCallback(() => {
-    markSeen(window.localStorage, entries, DEFAULT_SEEN_KEY);
-    setOpen(false);
-  }, [entries]);
+  const dismiss = () => {
+    markWhatsNewSeen(() => window.localStorage, state.entries);
+    setState((current) => ({ ...current, open: false }));
+  };
 
-  if (!open) return null;
+  if (!state.open) return null;
 
   return (
     <div
@@ -103,7 +106,7 @@ export function WhatsNewModal({ language }: { language?: string }) {
           New in this release
         </h2>
 
-        {entries.map((entry) => {
+        {state.entries.map((entry) => {
           const loc = localize(entry, lang);
           return (
             <article

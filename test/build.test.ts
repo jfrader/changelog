@@ -64,15 +64,17 @@ test('full init → add → build → serve-less flow', async () => {
 
   const json = JSON.parse(await fs.readFile(path.join(project.changelogDir, 'changelog.json'), 'utf8'));
   assert.equal(json.product, 'mifulbo');
-  assert.equal(json.entries.length, 2);
+  assert.equal(json.entries.length, 1, 'drafts must not leak through the public JSON feed');
   assert.equal(json.entries[0].published, true);
-  assert.equal(json.entries[1].published, false);
   // newest first
   assert.equal(json.entries[0].date, '2026-08-07');
 
   const html = await fs.readFile(path.join(project.changelogDir, 'index.html'), 'utf8');
   assert.match(html, /changelog-data/);
   assert.match(html, /Match replays/);
+  assert.ok(!html.includes('Auction closes on time'), 'draft must not be embedded in the page payload');
+  assert.match(html, /function readPreference\(key\) \{\s+try \{/u);
+  assert.match(html, /function writePreference\(key, value\) \{\s+try \{/u);
   assert.match(html, /#22c55e/);
 });
 

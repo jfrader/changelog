@@ -2,9 +2,17 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 08 Aug 2026 14:37:05 GMT from 3 entries._
+_Generated Sat, 08 Aug 2026 15:20:22 GMT from 5 entries._
 
 ## 2026-08-08
+
+### What's New remembers every release
+
+_Fix · 1.1.2 · `sdk` `browser`_
+
+Use the storage-backed SDK helpers to keep later same-day entries visible
+without replaying old news, even when upgrading from date-only state. What's
+New and generated pages remain usable when browser storage is blocked.
 
 ### Multilingual entries
 
@@ -18,6 +26,13 @@ _Improvement · 1.1.2 · `package` `distribution`_
 
 Install `@jfrader/changelog` from npmjs or GitHub Packages. Both registries
 receive the same verified release artifact.
+
+### Drafts stay out of public feeds
+
+_Fix · 1.1.2 · `feed` `privacy`_
+
+Draft entries are now excluded from generated JSON, rendered outputs, and raw
+server routes, so unpublished copy stays private.
 
 ## 2026-08-07
 

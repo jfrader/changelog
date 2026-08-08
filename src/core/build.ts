@@ -12,6 +12,7 @@ export async function buildProject(project: ChangelogProject): Promise<BuildResu
 
   const publishedCount = entries.filter((entry) => entry.published).length;
   const skippedCount = entries.length - publishedCount;
+  const publishedEntries = entries.filter((entry) => entry.published);
 
   const document: ChangelogDocument = {
     schema: 1,
@@ -22,7 +23,7 @@ export async function buildProject(project: ChangelogProject): Promise<BuildResu
     languages: project.config.languages,
     defaultLanguage: project.config.defaultLanguage,
     generatedAt: new Date().toISOString(),
-    entries,
+    entries: publishedEntries,
   };
 
   return {

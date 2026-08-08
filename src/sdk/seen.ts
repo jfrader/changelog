@@ -1,14 +1,15 @@
 /**
  * Framework-agnostic helpers for the in-app "What's New" modal pattern.
  *
- * Each game stores the last changelog date the player saw (via `SeenStorage`,
- * typically localStorage) and shows every published entry dated after it. The
- * modal shell itself is rendered by each game in its own UI style; this module
- * only owns the state and the filtering.
+ * Each game stores the changelog date and entry ids the player saw (via
+ * `SeenStorage`, typically localStorage) and shows every published entry not
+ * yet dismissed. The modal shell itself is rendered by each game in its own
+ * UI style; this module only owns the state and filtering.
  */
 import type { ChangelogEntry } from '../core/types.js';
 
 export const DEFAULT_SEEN_KEY = 'changelog.lastSeenDate';
+export const DEFAULT_SEEN_IDS_KEY = 'changelog.seenEntryIds';
 
 export interface LocalizedEntry {
   title: string;
@@ -28,6 +29,17 @@ export function localize(entry: ChangelogEntry, language: string): LocalizedEntr
 export interface SeenStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
+}
+
+export type SeenStorageSource =
+  | SeenStorage
+  | (() => SeenStorage | null | undefined)
+  | null
+  | undefined;
+
+export interface SeenStorageOptions {
+  dateKey?: string;
+  entryIdsKey?: string;
 }
 
 /** Parse a stored date, tolerating junk from older versions. */
@@ -88,6 +100,100 @@ export function computeWhatsNew(
   return { entries: newEntries, hasNew: newEntries.length > 0 };
 }
 
+function resolveSeenStorage(source: SeenStorageSource): SeenStorage | undefined {
+  try {
+    return (typeof source === 'function' ? source() : source) ?? undefined;
+  } catch {
+    // Accessing window.localStorage itself can throw under browser policy.
+    return undefined;
+  }
+}
+
+interface SeenEntryIdState {
+  ids: ReadonlySet<string>;
+  present: boolean;
+}
+
+function readSeenEntryIdState(
+  storage: SeenStorage,
+  key: string = DEFAULT_SEEN_IDS_KEY,
+): SeenEntryIdState {
+  try {
+    const raw = storage.getItem(key);
+    if (raw === null) return { ids: new Set(), present: false };
+    const parsed: unknown = JSON.parse(raw);
+    return {
+      ids: new Set(
+        Array.isArray(parsed)
+          ? parsed.filter((value): value is string => typeof value === 'string')
+          : [],
+      ),
+      present: true,
+    };
+  } catch {
+    // A blocked read has no state; corrupt stored JSON is present but unusable.
+    return { ids: new Set(), present: false };
+  }
+}
+
+const newestFirst = (entries: ChangelogEntry[]): ChangelogEntry[] =>
+  [...entries].sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return a.id < b.id ? 1 : -1;
+  });
+
+/**
+ * Compute unread entries directly from browser-like storage. Entry ids keep a
+ * second release on the same calendar day visible; the older date key remains
+ * a migration floor so already-dismissed history does not return.
+ *
+ * Storage access is deliberately best-effort. Private browsing and browser
+ * policy can reject it, but What's New must never take down the host app.
+ */
+export function computeWhatsNewFromStorage(
+  entries: ChangelogEntry[],
+  storageSource: SeenStorageSource,
+  options: SeenStorageOptions = {},
+): WhatsNewState {
+  const publishedEntries = newestFirst(entries.filter((entry) => entry.published !== false));
+  const storage = resolveSeenStorage(storageSource);
+  if (!storage) return { entries: publishedEntries, hasNew: publishedEntries.length > 0 };
+
+  let lastSeenDate: string | null = null;
+  try {
+    lastSeenDate = readSeenDate(storage, options.dateKey ?? DEFAULT_SEEN_KEY);
+  } catch {
+    // Treat blocked storage as a first visit.
+  }
+  const entryIdsKey = options.entryIdsKey ?? DEFAULT_SEEN_IDS_KEY;
+  const seenState = readSeenEntryIdState(storage, entryIdsKey);
+
+  /* Date-only consumers predate id tracking. Seed every entry already present
+     on their cutoff day and preserve the old strict-date behavior once, so an
+     SDK upgrade does not replay news they dismissed. A later entry appended
+     to that day then has a new id and remains visible. */
+  if (lastSeenDate && !seenState.present) {
+    const cutoffIds = publishedEntries
+      .filter((entry) => entry.date === lastSeenDate)
+      .map((entry) => entry.id)
+      .reverse();
+    try {
+      storage.setItem(entryIdsKey, JSON.stringify(cutoffIds));
+    } catch {
+      // Migration is best-effort when storage is read-only.
+    }
+    const newEntries = publishedEntries.filter((entry) => entry.date > lastSeenDate);
+    return { entries: newEntries, hasNew: newEntries.length > 0 };
+  }
+
+  const cutoff = lastSeenDate ?? '0000-00-00';
+  const newEntries = publishedEntries.filter(
+    (entry) => entry.date > cutoff || (entry.date === cutoff && !seenState.ids.has(entry.id)),
+  );
+
+  return { entries: newEntries, hasNew: newEntries.length > 0 };
+}
+
 /** Mark today as seen; returns the date stored. */
 export function markSeenToday(storage: SeenStorage, key: string = DEFAULT_SEEN_KEY): string {
   const today = localToday();
@@ -112,4 +218,55 @@ export function markSeen(
   );
   writeSeenDate(storage, seen, key);
   return seen;
+}
+
+/**
+ * Persist the entries dismissed by a What's New surface. Writes both the
+ * legacy date and the ids dismissed on that cutoff day. Older dates need no
+ * ids because the date floor covers them. Storage failure silently degrades
+ * so dismissal still works for the current visit.
+ */
+export function markWhatsNewSeen(
+  storageSource: SeenStorageSource,
+  entries: ChangelogEntry[],
+  options: SeenStorageOptions = {},
+): void {
+  const storage = resolveSeenStorage(storageSource);
+  if (!storage) return;
+
+  const dateKey = options.dateKey ?? DEFAULT_SEEN_KEY;
+  let existingDate: string | null = null;
+  try {
+    existingDate = readSeenDate(storage, dateKey);
+  } catch {
+    // The id write below may still be available.
+  }
+
+  const entryIdsKey = options.entryIdsKey ?? DEFAULT_SEEN_IDS_KEY;
+  const latestEntryDate = entries.reduce(
+    (latest, entry) => (entry.date > latest ? entry.date : latest),
+    existingDate ?? '0000-00-00',
+  );
+  if (latestEntryDate === '0000-00-00') return;
+
+  const newEntries = entries
+    .filter((entry) => entry.date === latestEntryDate)
+    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const newIds = new Set(newEntries.map((entry) => entry.id));
+  const existingState = readSeenEntryIdState(storage, entryIdsKey);
+  const existingIds =
+    existingDate === latestEntryDate
+      ? [...existingState.ids].filter((entryId) => !newIds.has(entryId))
+      : [];
+  const mergedIds = [...existingIds, ...newIds];
+  try {
+    writeSeenDate(storage, latestEntryDate, dateKey);
+  } catch {
+    // Entry ids may still be writable even if the date state is blocked.
+  }
+  try {
+    storage.setItem(entryIdsKey, JSON.stringify(mergedIds));
+  } catch {
+    // Persistence is optional; the host app can still close its current dialog.
+  }
 }

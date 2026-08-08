@@ -2,9 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   computeWhatsNew,
+  computeWhatsNewFromStorage,
   entriesSince,
   localToday,
   markSeen,
+  markWhatsNewSeen,
   markSeenToday,
   readSeenDate,
   shouldShowWhatsNew,
@@ -93,4 +95,63 @@ test('markSeen stores the latest of local date and newest entry date', () => {
   assert.equal(readSeenDate(storage), '2026-08-09');
   // After marking, the shown entries never reappear, even behind UTC.
   assert.equal(shouldShowWhatsNew(entries, readSeenDate(storage)), false);
+});
+
+test('storage state keeps a later same-day entry visible', () => {
+  const storage = memoryStorage();
+  // A historical date proves dismissal cannot use the browser's current date
+  // as its floor: another entry may be appended to that release later.
+  const first = makeEntry({ id: 'first', date: '2020-01-02' });
+  const second = makeEntry({ id: 'second', date: '2020-01-02' });
+
+  markWhatsNewSeen(storage, [first]);
+
+  const state = computeWhatsNewFromStorage([first, second], storage);
+  assert.deepEqual(state.entries.map((entry) => entry.id), ['second']);
+});
+
+test('date-only state migrates without replaying entries already dismissed that day', () => {
+  const storage = memoryStorage();
+  const first = makeEntry({ id: 'first', date: '2026-08-08' });
+  const second = makeEntry({ id: 'second', date: '2026-08-08' });
+  storage.setItem(DEFAULT_SEEN_KEY, '2026-08-08');
+
+  assert.deepEqual(computeWhatsNewFromStorage([first, second], storage).entries, []);
+
+  const later = makeEntry({ id: 'later', date: '2026-08-08' });
+  assert.deepEqual(
+    computeWhatsNewFromStorage([first, second, later], storage).entries.map((entry) => entry.id),
+    ['later'],
+  );
+});
+
+test('same-day dismissal retains every entry needed by the cutoff', () => {
+  const storage = memoryStorage();
+  const newest = makeEntry({ id: 'z-newest', date: '2026-08-08' });
+  const older = makeEntry({ id: 'a-older', date: '2026-08-08' });
+
+  markWhatsNewSeen(storage, [newest, older]);
+
+  assert.deepEqual(computeWhatsNewFromStorage([newest, older], storage).entries, []);
+});
+
+test('storage-backed helpers tolerate blocked browser storage', () => {
+  const blocked: SeenStorage = {
+    getItem() {
+      throw new Error('blocked');
+    },
+    setItem() {
+      throw new Error('blocked');
+    },
+  };
+  const entry = makeEntry({ id: 'visible' });
+
+  assert.deepEqual(computeWhatsNewFromStorage([entry], blocked).entries, [entry]);
+  assert.doesNotThrow(() => markWhatsNewSeen(blocked, [entry]));
+
+  const blockedGetter = () => {
+    throw new Error('blocked getter');
+  };
+  assert.deepEqual(computeWhatsNewFromStorage([entry], blockedGetter).entries, [entry]);
+  assert.doesNotThrow(() => markWhatsNewSeen(blockedGetter, [entry]));
 });

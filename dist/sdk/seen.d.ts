@@ -1,13 +1,14 @@
 /**
  * Framework-agnostic helpers for the in-app "What's New" modal pattern.
  *
- * Each game stores the last changelog date the player saw (via `SeenStorage`,
- * typically localStorage) and shows every published entry dated after it. The
- * modal shell itself is rendered by each game in its own UI style; this module
- * only owns the state and the filtering.
+ * Each game stores the changelog date and entry ids the player saw (via
+ * `SeenStorage`, typically localStorage) and shows every published entry not
+ * yet dismissed. The modal shell itself is rendered by each game in its own
+ * UI style; this module only owns the state and filtering.
  */
 import type { ChangelogEntry } from '../core/types.js';
 export declare const DEFAULT_SEEN_KEY = "changelog.lastSeenDate";
+export declare const DEFAULT_SEEN_IDS_KEY = "changelog.seenEntryIds";
 export interface LocalizedEntry {
     title: string;
     body: string;
@@ -20,6 +21,11 @@ export declare function localize(entry: ChangelogEntry, language: string): Local
 export interface SeenStorage {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
+}
+export type SeenStorageSource = SeenStorage | (() => SeenStorage | null | undefined) | null | undefined;
+export interface SeenStorageOptions {
+    dateKey?: string;
+    entryIdsKey?: string;
 }
 /** Parse a stored date, tolerating junk from older versions. */
 export declare function readSeenDate(storage: SeenStorage, key?: string): string | null;
@@ -41,6 +47,15 @@ export interface WhatsNewState {
 }
 /** One-call state computation for a modal component or hook. */
 export declare function computeWhatsNew(entries: ChangelogEntry[], lastSeenDate: string | null): WhatsNewState;
+/**
+ * Compute unread entries directly from browser-like storage. Entry ids keep a
+ * second release on the same calendar day visible; the older date key remains
+ * a migration floor so already-dismissed history does not return.
+ *
+ * Storage access is deliberately best-effort. Private browsing and browser
+ * policy can reject it, but What's New must never take down the host app.
+ */
+export declare function computeWhatsNewFromStorage(entries: ChangelogEntry[], storageSource: SeenStorageSource, options?: SeenStorageOptions): WhatsNewState;
 /** Mark today as seen; returns the date stored. */
 export declare function markSeenToday(storage: SeenStorage, key?: string): string;
 /**
@@ -50,3 +65,10 @@ export declare function markSeenToday(storage: SeenStorage, key?: string): strin
  * entries viewed from a timezone behind UTC).
  */
 export declare function markSeen(storage: SeenStorage, entries: ChangelogEntry[], key?: string): string;
+/**
+ * Persist the entries dismissed by a What's New surface. Writes both the
+ * legacy date and the ids dismissed on that cutoff day. Older dates need no
+ * ids because the date floor covers them. Storage failure silently degrades
+ * so dismissal still works for the current visit.
+ */
+export declare function markWhatsNewSeen(storageSource: SeenStorageSource, entries: ChangelogEntry[], options?: SeenStorageOptions): void;

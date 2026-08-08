@@ -9,8 +9,38 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-08-08T14:37:05.302Z",
+  "generatedAt": "2026-08-08T15:20:22.078Z",
   "entries": [
+    {
+      "id": "2026-08-08--what-s-new-remembers-every-release",
+      "kind": "fix",
+      "title": "What's New remembers every release",
+      "body": "Use the storage-backed SDK helpers to keep later same-day entries visible\nwithout replaying old news, even when upgrading from date-only state. What's\nNew and generated pages remain usable when browser storage is blocked.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "en": "What's New remembers every release",
+        "es": "Novedades recuerda cada versión"
+      },
+      "bodyByLang": {
+        "en": "Use the storage-backed SDK helpers to keep later same-day entries visible\nwithout replaying old news, even when upgrading from date-only state. What's\nNew and generated pages remain usable when browser storage is blocked.",
+        "es": "Usá los helpers de almacenamiento del SDK para mostrar novedades posteriores\ndel mismo día sin repetir las anteriores, incluso al migrar el estado previo.\nNovedades y las páginas generadas siguen funcionando si el navegador bloquea\nel almacenamiento."
+      },
+      "date": "2026-08-08",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.1.2",
+      "tags": [
+        "sdk",
+        "browser"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-08--what-s-new-remembers-every-release.md",
+      "relPath": "entries/2026-08-08--what-s-new-remembers-every-release.md"
+    },
     {
       "id": "2026-08-08--multilingual-entries",
       "kind": "feature",
@@ -69,6 +99,36 @@
       "published": true,
       "fileName": "2026-08-08--install-from-either-registry.md",
       "relPath": "entries/2026-08-08--install-from-either-registry.md"
+    },
+    {
+      "id": "2026-08-08--drafts-stay-out-of-public-feeds",
+      "kind": "fix",
+      "title": "Drafts stay out of public feeds",
+      "body": "Draft entries are now excluded from generated JSON, rendered outputs, and raw\nserver routes, so unpublished copy stays private.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "en": "Drafts stay out of public feeds",
+        "es": "Los borradores quedan fuera de los feeds públicos"
+      },
+      "bodyByLang": {
+        "en": "Draft entries are now excluded from generated JSON, rendered outputs, and raw\nserver routes, so unpublished copy stays private.",
+        "es": "Las entradas en borrador ahora quedan fuera del JSON, los archivos generados y\nlas rutas de contenido del servidor, para que lo que no publicaste siga privado."
+      },
+      "date": "2026-08-08",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.1.2",
+      "tags": [
+        "feed",
+        "privacy"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-08--drafts-stay-out-of-public-feeds.md",
+      "relPath": "entries/2026-08-08--drafts-stay-out-of-public-feeds.md"
     },
     {
       "id": "2026-08-07--first-public-release",

@@ -6,6 +6,7 @@
 import { createServer } from 'node:http';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { parseEntry } from '../core/entry.js';
 const MIME = {
     '.html': 'text/html; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
@@ -39,8 +40,30 @@ export async function startServer(project, options) {
                     res.end('Not found');
                     return;
                 }
+                const document = JSON.parse(await fs.readFile(path.join(outDir, 'changelog.json'), 'utf8'));
+                const isPublished = document.entries?.some((entry) => entry.fileName === safe && entry.published !== false);
+                if (!isPublished) {
+                    res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+                    res.end('Not found');
+                    return;
+                }
                 const file = path.join(entryDir, safe);
-                const source = await fs.readFile(file, 'utf8');
+                let source;
+                try {
+                    source = await fs.readFile(file, 'utf8');
+                }
+                catch {
+                    res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+                    res.end('Not found');
+                    return;
+                }
+                const current = parseEntry({ fileName: safe, source, config: project.config });
+                if (!current.entry?.published ||
+                    current.issues.some((issue) => issue.level === 'error')) {
+                    res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+                    res.end('Not found');
+                    return;
+                }
                 res.writeHead(200, { 'content-type': MIME['.md'], 'cache-control': 'no-store' });
                 res.end(source);
                 return;

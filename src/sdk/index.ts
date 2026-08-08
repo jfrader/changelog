@@ -5,17 +5,22 @@
  */
 export {
   computeWhatsNew,
+  computeWhatsNewFromStorage,
   entriesSince,
   localize,
   localToday,
   markSeen,
+  markWhatsNewSeen,
   markSeenToday,
   readSeenDate,
   shouldShowWhatsNew,
   writeSeenDate,
   DEFAULT_SEEN_KEY,
+  DEFAULT_SEEN_IDS_KEY,
   type LocalizedEntry,
   type SeenStorage,
+  type SeenStorageSource,
+  type SeenStorageOptions,
   type WhatsNewState,
 } from './seen.js';
 export type {

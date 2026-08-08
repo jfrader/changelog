@@ -8,30 +8,29 @@ app** as a "What's New" modal, driven by the browser-safe SDK
 
 1. **Data** — your app ships the `changelog.json` that `changelog build`
    generates (bundle it, or fetch it).
-2. **Seen-tracking** — the SDK remembers the last changelog date the player
-   dismissed (`changelog.lastSeenDate` in `localStorage`).
-3. **On boot** — compute which entries are new since that date; if any, open
-   the modal once.
+2. **Seen-tracking** — the SDK remembers both the release date and exact entry
+   ids the player dismissed.
+3. **On boot** — compute which entries are new; if any, open the modal once.
 4. **On dismiss** — mark them seen so the modal does not reappear until the
    next release adds entries.
 
 ```ts
 import {
-  computeWhatsNew,
-  markSeen,
-  readSeenDate,
-  DEFAULT_SEEN_KEY,
+  computeWhatsNewFromStorage,
+  markWhatsNewSeen,
 } from "@jfrader/changelog/sdk";
 
-const lastSeen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
-const { entries, hasNew } = computeWhatsNew(changelogData.entries, lastSeen);
+const { entries, hasNew } = computeWhatsNewFromStorage(
+  changelogData.entries,
+  () => window.localStorage,
+);
 
 if (hasNew) {
   openModal(entries);
 }
 
 // When the player dismisses it:
-markSeen(window.localStorage, entries, DEFAULT_SEEN_KEY);
+markWhatsNewSeen(() => window.localStorage, entries);
 ```
 
 The SDK has no Node or DOM dependencies; you render the modal shell in your own
@@ -57,11 +56,11 @@ python3 -m http.server 8080
 # open http://localhost:8080
 ```
 
-The page auto-opens the modal with any entries newer than the last seen date.
+The page auto-opens the modal with any entries not seen yet.
 Click **Got it** to dismiss; reload and it stays closed. The **What's new**
 button always reopens the modal with the full changelog. To see the auto-open
-again, clear `changelog.lastSeenDate` in DevTools, or add a newer-dated entry
-to `examples/vanilla/changelog.json`.
+again, clear `changelog.lastSeenDate` and `changelog.seenEntryIds` in DevTools,
+or add an entry to `examples/vanilla/changelog.json`.
 
 > In a real app you would import the SDK from the installed package
 > (`@jfrader/changelog/sdk`), not from `../../dist/sdk/index.js`. The relative

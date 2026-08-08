@@ -9,6 +9,7 @@ export async function buildProject(project) {
     const { entries, issues } = await readEntries(entryDir, project.config);
     const publishedCount = entries.filter((entry) => entry.published).length;
     const skippedCount = entries.length - publishedCount;
+    const publishedEntries = entries.filter((entry) => entry.published);
     const document = {
         schema: 1,
         product: project.config.product,
@@ -18,7 +19,7 @@ export async function buildProject(project) {
         languages: project.config.languages,
         defaultLanguage: project.config.defaultLanguage,
         generatedAt: new Date().toISOString(),
-        entries,
+        entries: publishedEntries,
     };
     return {
         document,

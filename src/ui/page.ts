@@ -259,8 +259,25 @@ const JS = `
   };
   const KIND_ORDER = ['feature', 'improvement', 'fix', 'breaking', 'chore'];
 
+  function readPreference(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      // Preference persistence is optional under restrictive browser policy.
+      return null;
+    }
+  }
+
+  function writePreference(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // The page remains usable even when preference persistence is blocked.
+    }
+  }
+
   function detectLanguage() {
-    const saved = localStorage.getItem('changelog-lang');
+    const saved = readPreference('changelog-lang');
     if (saved && LANGUAGES.includes(saved)) return saved;
     const nav = String(navigator.language || DEFAULT_LANG).toLowerCase();
     for (const l of LANGUAGES) {
@@ -355,7 +372,7 @@ const JS = `
       btn.setAttribute('aria-label', l);
       btn.addEventListener('click', () => {
         state.lang = l;
-        localStorage.setItem('changelog-lang', l);
+        writePreference('changelog-lang', l);
         setChrome();
         render();
       });
@@ -442,7 +459,7 @@ const JS = `
 
   // ---- theme ----
   const toggle = document.getElementById('theme-toggle');
-  const saved = localStorage.getItem('changelog-theme');
+  const saved = readPreference('changelog-theme');
   const preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (saved === 'dark' || (!saved && preferDark)) document.documentElement.setAttribute('data-theme', 'dark');
   toggle.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
@@ -450,7 +467,7 @@ const JS = `
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     if (dark) document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('changelog-theme', dark ? 'light' : 'dark');
+    writePreference('changelog-theme', dark ? 'light' : 'dark');
     toggle.textContent = dark ? '🌙' : '☀️';
   });
 
