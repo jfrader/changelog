@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What's New modal — vanilla example</title>
+  <style>
+    :root {
+      --accent: #6366f1;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1d2433;
+      --muted: #5c6577;
+      --line: #e4e7ef;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+    }
+    .demo {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 { margin: 0 0 8px; }
+    p { color: var(--muted); max-width: 480px; margin: 0 auto 24px; }
+    button {
+      font: inherit;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+
+    /* ---- modal ---- */
+    dialog.whatsnew {
+      width: min(520px, calc(100vw - 32px));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 20px 60px -20px rgba(20, 30, 60, 0.35);
+    }
+    dialog.whatsnew::backdrop {
+      background: rgba(15, 20, 40, 0.45);
+      backdrop-filter: blur(4px);
+    }
+    .whatsnew-inner { padding: 28px; }
+    .whatsnew-eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 6px;
+    }
+    .whatsnew-inner h2 { margin: 0 0 18px; }
+    .entry {
+      border: 1px solid var(--line);
+      border-left-width: 4px;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .entry[data-kind="feature"] { border-left-color: var(--accent); }
+    .entry[data-kind="improvement"] { border-left-color: #0ea5e9; }
+    .entry[data-kind="fix"] { border-left-color: #f59e0b; }
+    .entry[data-kind="breaking"] { border-left-color: #ef4444; }
+    .entry[data-kind="chore"] { border-left-color: #94a3b8; }
+    .entry h3 { margin: 0 0 4px; font-size: 15px; }
+    .entry p { margin: 0; font-size: 13.5px; color: var(--muted); text-align: left; }
+    .entry .badge {
+      display: inline-block;
+      margin-bottom: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--line);
+    }
+    .whatsnew-actions { margin-top: 18px; text-align: right; }
+    .seen-note { font-size: 12px; color: var(--muted); margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main class="demo">
+    <h1>What's New modal</h1>
+    <p>
+      This page loads <code>changelog.json</code>, asks the SDK which entries are
+      newer than the last seen date, and shows the modal. Reload after dismissing
+      to see it stay closed.
+    </p>
+    <button id="open-btn" type="button">What's new</button>
+    <p class="seen-note" id="seen-note"></p>
+  </main>
+
+  <!-- The modal itself -->
+  <dialog class="whatsnew" id="whatsnew-dialog" aria-labelledby="whatsnew-title">
+    <div class="whatsnew-inner">
+      <p class="whatsnew-eyebrow" id="whatsnew-title">What's new</p>
+      <h2 id="whatsnew-heading">New in this release</h2>
+      <div id="whatsnew-list"></div>
+      <div class="whatsnew-actions">
+        <button type="button" id="got-it-btn">Got it</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Import the browser-safe SDK straight from the repo build. In a real app
+       this would be `import ... from "@jfrader/changelog/sdk";` -->
+  <script type="module">
+    import {
+      computeWhatsNew,
+      markSeen,
+      readSeenDate,
+      DEFAULT_SEEN_KEY,
+    } from "../../dist/sdk/index.js";
+
+    const KIND_LABEL = {
+      feature: "New feature",
+      improvement: "Improvement",
+      fix: "Fix",
+      breaking: "Breaking change",
+      chore: "Chore",
+    };
+
+    const dialog = document.getElementById("whatsnew-dialog");
+    const list = document.getElementById("whatsnew-list");
+    const seenNote = document.getElementById("seen-note");
+    const openBtn = document.getElementById("open-btn");
+    const gotItBtn = document.getElementById("got-it-btn");
+
+    let allEntries = [];
+    let newEntries = [];
+
+    function renderEntries(entries) {
+      list.innerHTML = "";
+      for (const entry of entries) {
+        const card = document.createElement("article");
+        card.className = "entry";
+        card.dataset.kind = entry.kind;
+        card.innerHTML = `
+          <span class="badge">${KIND_LABEL[entry.kind] ?? entry.kind}</span>
+          <h3>${entry.title.replace(/</g, "&lt;")}</h3>
+          ${entry.body ? `<p>${entry.body.replace(/</g, "&lt;")}</p>` : ""}
+        `;
+        list.appendChild(card);
+      }
+      if (entries.length === 0) {
+        list.innerHTML = '<p style="color:#5c6577">Nothing new since your last visit.</p>';
+      }
+    }
+
+    // Manual button: show the full changelog.
+    function openModal() {
+      renderEntries(allEntries);
+      if (allEntries.length > 0 && !dialog.open) {
+        dialog.showModal();
+      }
+    }
+
+    // Auto-open on boot: show only what is newer than the last seen date.
+    function openModalWithNew() {
+      renderEntries(newEntries);
+      if (newEntries.length > 0 && !dialog.open) {
+        dialog.showModal();
+      }
+    }
+
+    function dismiss() {
+      // Persist "seen" so the modal does not reappear until newer entries land.
+      markSeen(window.localStorage, newEntries, DEFAULT_SEEN_KEY);
+      dialog.close();
+      refreshSeenNote();
+    }
+
+    function refreshSeenNote() {
+      const seen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
+      seenNote.textContent = seen
+        ? `Last seen changelog date: ${seen} (localStorage "${DEFAULT_SEEN_KEY}") — the button browses the full changelog.`
+        : "Nothing seen yet — the modal opens on load.";
+    }
+
+    async function boot() {
+      const response = await fetch("./changelog.json");
+      const changelog = await response.json();
+
+      allEntries = changelog.entries.filter((entry) => entry.published !== false);
+      const lastSeen = readSeenDate(window.localStorage, DEFAULT_SEEN_KEY);
+      const { entries, hasNew } = computeWhatsNew(allEntries, lastSeen);
+      newEntries = entries;
+      refreshSeenNote();
+
+      // The core of the pattern: open once on boot when there is something new.
+      if (hasNew) openModalWithNew();
+    }
+
+    openBtn.addEventListener("click", openModal);
+    gotItBtn.addEventListener("click", dismiss);
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      dismiss();
+    });
+
+    void boot();
+  </script>
+</body>
+</html>

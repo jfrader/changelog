@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "product": "demo-app",
+  "productName": "Demo App",
+  "tagline": "A quick tour of the What's New modal",
+  "accent": "#6366f1",
+  "generatedAt": "2026-08-07T12:00:00.000Z",
+  "entries": [
+    {
+      "id": "2026-08-07--dark-mode",
+      "kind": "feature",
+      "title": "Dark mode",
+      "body": "Switch the whole app to a dark theme from the header.",
+      "date": "2026-08-07",
+      "product": "demo-app",
+      "productName": "Demo App",
+      "tags": ["ui", "theme"],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-07--dark-mode.md",
+      "relPath": "entries/2026-08-07--dark-mode.md"
+    },
+    {
+      "id": "2026-08-06--faster-loads",
+      "kind": "improvement",
+      "title": "Faster page loads",
+      "body": "Reports and the market now open noticeably quicker.",
+      "date": "2026-08-06",
+      "product": "demo-app",
+      "productName": "Demo App",
+      "tags": ["performance"],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-06--faster-loads.md",
+      "relPath": "entries/2026-08-06--faster-loads.md"
+    },
+    {
+      "id": "2026-08-05--empty-board-crash",
+      "kind": "fix",
+      "title": "Fix crash on an empty board",
+      "body": "Opening a board with no players no longer freezes the app.",
+      "date": "2026-08-05",
+      "product": "demo-app",
+      "productName": "Demo App",
+      "tags": ["board"],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-05--empty-board-crash.md",
+      "relPath": "entries/2026-08-05--empty-board-crash.md"
+    },
+    {
+      "id": "2026-08-04--v2-save-format",
+      "kind": "breaking",
+      "title": "Save files now use v2",
+      "body": "Older save files are upgraded automatically on first open.",
+      "date": "2026-08-04",
+      "product": "demo-app",
+      "productName": "Demo App",
+      "tags": ["storage"],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-04--v2-save-format.md",
+      "relPath": "entries/2026-08-04--v2-save-format.md"
+    }
+  ]
+}
