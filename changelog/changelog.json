@@ -4,13 +4,56 @@
   "productName": "changelog",
   "tagline": "What is new in the changelog tool",
   "accent": "#8b5cf6",
-  "generatedAt": "2026-08-08T00:41:27.263Z",
+  "languages": [
+    "en",
+    "es"
+  ],
+  "defaultLanguage": "en",
+  "generatedAt": "2026-08-08T03:03:52.554Z",
   "entries": [
+    {
+      "id": "2026-08-08--multilingual-entries",
+      "kind": "feature",
+      "title": "Multilingual entries",
+      "body": "Entries can now carry per-language titles and bodies; the end-user page and the in-app modals render in the reader's language.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "es": "Entradas en varios idiomas",
+        "en": "Multilingual entries"
+      },
+      "bodyByLang": {
+        "es": "Las entradas ahora pueden tener títulos y cuerpos por idioma; la página y los modales se muestran en el idioma del usuario.",
+        "en": "Entries can now carry per-language titles and bodies; the end-user page and the in-app modals render in the reader's language."
+      },
+      "date": "2026-08-08",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.1.0",
+      "tags": [
+        "i18n"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-08--multilingual-entries.md",
+      "relPath": "entries/2026-08-08--multilingual-entries.md"
+    },
     {
       "id": "2026-08-07--first-public-release",
       "kind": "feature",
       "title": "First public release",
       "body": "Zero-dependency changelog system: markdown entries, an agent-facing MD workflow, a build, a tiny serve backend, and a browser-safe in-app What's New SDK.",
+      "languages": [
+        "en"
+      ],
+      "titleByLang": {
+        "en": "First public release"
+      },
+      "bodyByLang": {
+        "en": "Zero-dependency changelog system: markdown entries, an agent-facing MD workflow, a build, a tiny serve backend, and a browser-safe in-app What's New SDK."
+      },
       "date": "2026-08-07",
       "product": "changelog",
       "productName": "changelog",

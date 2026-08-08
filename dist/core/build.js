@@ -15,6 +15,8 @@ export async function buildProject(project) {
         productName: project.config.productName,
         tagline: project.config.tagline,
         accent: project.config.accent,
+        languages: project.config.languages,
+        defaultLanguage: project.config.defaultLanguage,
         generatedAt: new Date().toISOString(),
         entries,
     };

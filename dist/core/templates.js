@@ -5,16 +5,25 @@ export const ENTRY_TEMPLATE = `---
 kind: feature
 date: DATE
 title: "TITLE"
+title.es: "TITLE_ES"
 tags: []
 audience: all
 published: true
 ---
+
+## en
 
 # TITLE
 
 Describe the change for end users in 1–3 short sentences. Keep it literal and
 helpful: what they can now do, or what no longer misbehaves. Use bullet lists
 only when a few distinct points add real value.
+
+## es
+
+# TITLE_ES
+
+Describe el cambio para los usuarios en 1–3 oraciones cortas.
 `;
 export const README_TEMPLATE = `# Changelog
 
@@ -57,16 +66,21 @@ Each entry is one file: \`entries/YYYY-MM-DD--short-slug.md\`.
 ---
 kind: feature            # feature | improvement | fix | breaking | chore
 date: 2026-08-07
-title: "What changed"
+title: "What changed"     # default-language title
+title.es: "Qué cambió"    # optional: title for another configured language
 tags: [match, replay]
 audience: all            # all | player | manager | guest | admin
 version: 0.1.0           # optional
 published: true          # false = draft, excluded from builds
 ---
 
-# What changed
+## en
 
-End-user copy: 1–3 short sentences. Literal and helpful.
+End-user copy in the default language: 1–3 short sentences.
+
+## es
+
+Copy para usuarios en español: 1–3 oraciones cortas.
 \`\`\`
 
 Rules:
@@ -78,6 +92,20 @@ Rules:
   obvious (matching each product's writing style).
 - \`kind\` and \`date\` are required; a bad entry fails the build with a clear
   message and is skipped with a warning otherwise.
+
+### i18n (multi-language projects)
+
+- \`config.json\` lists the supported codes (\`languages\`) and which one is the
+  \`defaultLanguage\`. Unmarked content and legacy entries belong to the
+  default language.
+- Per-language titles live in frontmatter: \`title.en\`, \`title.es\`, …
+  (the plain \`title\` key is the default language).
+- Per-language bodies live in the body under \`## <code>\` headings. The default
+  language may be the first unmarked section for a single-language entry.
+- The end-user page and the \`localize\` SDK helper pick the reader's language
+  and fall back to the default language when a language lacks content.
+- Single-language entries (no \`title.<lang>\`, no \`## <code>\` sections) keep
+  working unchanged and are treated as default-language content.
 
 ## 2. Add an entry
 
@@ -194,19 +222,32 @@ internal and skip it.
 ---
 kind: feature            # feature | improvement | fix | breaking | chore
 date: YYYY-MM-DD
-title: "Short title"
+title: "Short title"     # default language
+title.es: "Título corto" # optional per-language title
 tags: [optional, tags]
 audience: all
 published: true          # false keeps a draft out of builds
 ---
 
-# Short title
+## en
 
 One to three short, literal sentences for end users.
+
+## es
+
+Una a tres oraciones cortas y literales para los usuarios.
 \`\`\`
 
 Required: \`kind\`, \`date\`, and a title. Broken entries are reported and
 skipped by the build; fix them before shipping.
+
+### i18n
+
+Write entries in every language the product ships (\`config.json\` →
+\`languages\`): per-language titles as \`title.<code>\`, per-language bodies
+under \`## <code>\` headings. The default language is the one unmarked/legacy
+content belongs to; the page and the SDK fall back to it when a language is
+missing.
 
 ## Commands
 
@@ -227,6 +268,9 @@ export const AGENTS_SNIPPET_TEMPLATE = `## Changelog
   \`YYYY-MM-DD--slug.md\`), committed with the change it describes.
 - Scaffold entries with \`changelog add\` (from this repo root) and fill the
   body with brief, literal end-user copy. Never invent an entry.
+- Write copy in every language the product ships: per-language titles as
+  \`title.<code>\` and per-language bodies under \`## <code>\` sections (see
+  \`changelog/RUNBOOK.md\`).
 - Run \`changelog build\` before shipping so \`changelog/CHANGELOG.md\`,
   \`changelog/changelog.json\`, and the end-user page \`changelog/index.html\`
   stay current. Serve or publish the page only when asked.

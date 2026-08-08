@@ -68,14 +68,16 @@ Commands:
        --root <dir>            Repo root (default: cwd)
        --force                 Re-create config + templates
   add                  Scaffold a new entry.
-       --title "..."           Required
+       --title "..."           Default-language title (required unless --title.<lang>)
+       --title.es "..."        Title for another language (repeat per language)
+       --body "..."            Default-language body
+       --body.es "..."         Body for another language (repeat per language)
        --kind <kind>           feature|improvement|fix|breaking|chore (default: feature)
        --date YYYY-MM-DD       Default: today
        --version x.y.z         Optional
        --tags a,b,c            Optional
        --audience <a>          all|player|manager|guest|admin (default: all)
        --draft                 Create as unpublished
-       --body "..."            Optional end-user copy
        --root <dir>
   list                 List entries (--all includes drafts).
   build                Generate CHANGELOG.md, changelog.json, index.html.
@@ -118,8 +120,19 @@ async function main() {
         }
         case 'add': {
             const title = str(flags, 'title', positional[0] ?? '');
-            if (!title) {
-                console.error('error: --title is required for `add`');
+            // Per-language titles/bodies: --title.es "..." / --body.es "..."
+            const titleByLang = {};
+            const bodyByLang = {};
+            for (const [key, value] of Object.entries(flags)) {
+                if (key.startsWith('title.') && typeof value === 'string' && value) {
+                    titleByLang[key.slice('title.'.length).toLowerCase()] = value;
+                }
+                if (key.startsWith('body.') && typeof value === 'string' && value) {
+                    bodyByLang[key.slice('body.'.length).toLowerCase()] = value;
+                }
+            }
+            if (!title && Object.keys(titleByLang).length === 0) {
+                console.error('error: --title (or --title.<lang>) is required for `add`');
                 process.exitCode = 1;
                 return;
             }
@@ -133,6 +146,8 @@ async function main() {
                 root,
                 kind,
                 title,
+                titleByLang,
+                bodyByLang,
                 date: str(flags, 'date') || undefined,
                 version: str(flags, 'version') || undefined,
                 tags: str(flags, 'tags') ? str(flags, 'tags').split(',').map((t) => t.trim()).filter(Boolean) : undefined,

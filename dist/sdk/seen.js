@@ -1,4 +1,13 @@
 export const DEFAULT_SEEN_KEY = 'changelog.lastSeenDate';
+/**
+ * Returns the title/body for a language, falling back to the entry's default
+ * language when that language has no content (empty strings fall back too).
+ */
+export function localize(entry, language) {
+    const title = entry.titleByLang?.[language] || entry.title;
+    const body = entry.bodyByLang?.[language] || entry.body;
+    return { title, body };
+}
 /** Parse a stored date, tolerating junk from older versions. */
 export function readSeenDate(storage, key = DEFAULT_SEEN_KEY) {
     const raw = storage.getItem(key);

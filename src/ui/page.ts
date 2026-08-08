@@ -126,6 +126,17 @@ h1 { margin: 10px 0 6px; font-size: 30px; line-height: 1.15; letter-spacing: -.0
 }
 .theme-toggle:hover { border-color: var(--accent); color: var(--text); }
 
+.langs { display: flex; gap: 4px; }
+.lang {
+  border: 1px solid var(--line); background: var(--panel); color: var(--text-soft);
+  height: 36px; padding: 0 10px; border-radius: 10px; cursor: pointer;
+  font-size: 13px; font-weight: 700; text-transform: uppercase; font-family: inherit;
+}
+.lang:hover { border-color: var(--accent); color: var(--text); }
+.lang.active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+
 .content { max-width: 860px; margin: 0 auto; padding: 26px 20px 60px; }
 
 .day { margin-bottom: 30px; }
@@ -219,11 +230,63 @@ const JS = `
   const accent = data.accent || '#22c55e';
   document.documentElement.style.setProperty('--accent', accent);
 
-  const KIND_LABEL = { feature: 'New feature', improvement: 'Improvement', fix: 'Fix', breaking: 'Breaking change', chore: 'Chore' };
-  const KIND_PLURAL = { feature: 'new features', improvement: 'improvements', fix: 'fixes', breaking: 'breaking changes', chore: 'chores' };
+  const LANGUAGES = Array.isArray(data.languages) && data.languages.length ? data.languages : ['en'];
+  const DEFAULT_LANG = data.defaultLanguage && LANGUAGES.includes(data.defaultLanguage) ? data.defaultLanguage : LANGUAGES[0];
+
+  // ---- UI strings per language ----
+  const UI = {
+    eyebrow: { en: "What's new", es: 'Novedades' },
+    title: { en: 'Changelog', es: 'Novedades' },
+    all: { en: 'All', es: 'Todos' },
+    search: { en: 'Search entries…', es: 'Buscar entradas…' },
+    empty: { en: 'No entries match your search.', es: 'Ninguna entrada coincide con tu búsqueda.' },
+    whatsNew: { en: 'New', es: 'Nuevo' },
+    published: { en: 'published entries', es: 'entradas publicadas' },
+  };
+  const KIND_LABEL = {
+    feature: { en: 'New feature', es: 'Nueva función' },
+    improvement: { en: 'Improvement', es: 'Mejora' },
+    fix: { en: 'Fix', es: 'Corrección' },
+    breaking: { en: 'Breaking change', es: 'Cambio importante' },
+    chore: { en: 'Chore', es: 'Mantenimiento' },
+  };
+  const KIND_PLURAL = {
+    feature: { en: 'new features', es: 'funciones nuevas' },
+    improvement: { en: 'improvements', es: 'mejoras' },
+    fix: { en: 'fixes', es: 'correcciones' },
+    breaking: { en: 'breaking changes', es: 'cambios importantes' },
+    chore: { en: 'chores', es: 'mantenimiento' },
+  };
   const KIND_ORDER = ['feature', 'improvement', 'fix', 'breaking', 'chore'];
 
-  const state = { filter: 'all', query: '' };
+  function detectLanguage() {
+    const saved = localStorage.getItem('changelog-lang');
+    if (saved && LANGUAGES.includes(saved)) return saved;
+    const nav = String(navigator.language || DEFAULT_LANG).toLowerCase();
+    for (const l of LANGUAGES) {
+      if (nav === l || nav.startsWith(l + '-')) return l;
+    }
+    return DEFAULT_LANG;
+  }
+
+  const state = { filter: 'all', query: '', lang: detectLanguage() };
+  const ui = (key) => (UI[key] && (UI[key][state.lang] || UI[key][DEFAULT_LANG])) || UI[key][DEFAULT_LANG] || key;
+  const kindLabel = (kind) => (KIND_LABEL[kind] && (KIND_LABEL[kind][state.lang] || KIND_LABEL[kind][DEFAULT_LANG])) || kind;
+  const kindPlural = (kind) => (KIND_PLURAL[kind] && (KIND_PLURAL[kind][state.lang] || KIND_PLURAL[kind][DEFAULT_LANG])) || kind;
+
+  function localizeEntry(e) {
+    const title = (e.titleByLang && e.titleByLang[state.lang]) || e.title;
+    const body = (e.bodyByLang && e.bodyByLang[state.lang]) || e.body;
+    return { title, body };
+  }
+
+  function searchText(e) {
+    const parts = [e.title || '', e.body || ''];
+    if (e.titleByLang) Object.values(e.titleByLang).forEach((t) => parts.push(t));
+    if (e.bodyByLang) Object.values(e.bodyByLang).forEach((b) => parts.push(b));
+    parts.push((e.tags || []).join(' '), e.version || '');
+    return parts.join(' ').toLowerCase();
+  }
 
   // ---- tiny safe markdown renderer ----
   function md(text) {
@@ -257,13 +320,50 @@ const JS = `
       .filter((e) => state.filter === 'all' || e.kind === state.filter)
       .filter((e) => {
         if (!state.query) return true;
-        const q = state.query.toLowerCase();
-        return (e.title + ' ' + e.body + ' ' + e.tags.join(' ') + ' ' + (e.version || '')).toLowerCase().includes(q);
+        return searchText(e).includes(state.query.toLowerCase());
       });
   }
 
-  // ---- render ----
+  // ---- chrome (language-switchable shell) ----
   const content = document.getElementById('content');
+  const filters = document.getElementById('filters');
+  const filterButtons = [];
+
+  function setChrome() {
+    document.documentElement.lang = state.lang;
+    document.getElementById('hero-eyebrow').textContent = data.productName + ' · ' + ui('eyebrow');
+    document.getElementById('page-title').textContent = ui('title');
+    document.getElementById('search').placeholder = ui('search');
+    const footer = document.getElementById('page-footer');
+    footer.textContent =
+      'Generated ' + new Date(data.generatedAt).toUTCString() + ' · ' +
+      data.entries.filter((e) => e.published).length + ' ' + ui('published');
+
+    filterButtons.forEach((btn) => {
+      const kind = btn.dataset.kind;
+      btn.className = 'filter' + (kind === state.filter ? ' active' : '');
+      btn.textContent = kind === 'all' ? ui('all') : kindPlural(kind) || kindLabel(kind) + 's';
+    });
+
+    const langs = document.getElementById('langs');
+    langs.innerHTML = '';
+    LANGUAGES.forEach((l) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lang' + (l === state.lang ? ' active' : '');
+      btn.textContent = l.toUpperCase();
+      btn.setAttribute('aria-label', l);
+      btn.addEventListener('click', () => {
+        state.lang = l;
+        localStorage.setItem('changelog-lang', l);
+        setChrome();
+        render();
+      });
+      langs.appendChild(btn);
+    });
+  }
+
+  // ---- render ----
   function render() {
     const entries = visibleEntries();
     const counts = {};
@@ -283,12 +383,12 @@ const JS = `
       const b = document.createElement('b');
       b.textContent = n;
       chip.appendChild(b);
-      chip.appendChild(document.createTextNode(' ' + (n === 1 ? KIND_LABEL[kind].toLowerCase() : KIND_PLURAL[kind])));
+      chip.appendChild(document.createTextNode(' ' + (n === 1 ? kindLabel(kind).toLowerCase() : kindPlural(kind))));
       summary.appendChild(chip);
     });
 
     if (entries.length === 0) {
-      content.innerHTML = '<div class="empty"><div class="big">🔍</div>No entries match your search.</div>';
+      content.innerHTML = '<div class="empty"><div class="big">🔍</div>' + ui('empty') + '</div>';
       return;
     }
 
@@ -304,17 +404,18 @@ const JS = `
     let html = '';
     byDate.forEach((list, date) => {
       const [y, m, d] = date.split('-');
-      const label = new Date(Date.UTC(+y, +m - 1, +d)).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+      const label = new Date(Date.UTC(+y, +m - 1, +d)).toLocaleDateString(state.lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
       html += '<section class="day"><h2 class="day-head">' + label + '</h2>';
       list.forEach((e) => {
+        const loc = localizeEntry(e);
         const isNew = e.id === latestFeatureId;
         const badges = (e.tags || []).map((t) => '<span class="tag">' + t.replace(/</g, '&lt;') + '</span>').join('');
         const version = e.version ? '<span class="tag">v' + e.version + '</span>' : '';
         const audience = e.audience && e.audience !== 'all' ? '<span class="audience">' + e.audience + '</span>' : '';
         html += '<article class="card is-' + e.kind + '">';
-        html += '<div class="card-head"><span class="badge">' + KIND_LABEL[e.kind] + '</span>';
-        html += '<h3>' + e.title.replace(/</g, '&lt;') + (isNew ? '<span class="whats-new"><span class="pulse"></span>New</span>' : '') + '</h3></div>';
-        if (e.body) html += '<div class="body">' + md(e.body) + '</div>';
+        html += '<div class="card-head"><span class="badge">' + kindLabel(e.kind) + '</span>';
+        html += '<h3>' + loc.title.replace(/</g, '&lt;') + (isNew ? '<span class="whats-new"><span class="pulse"></span>' + ui('whatsNew') + '</span>' : '') + '</h3></div>';
+        if (loc.body) html += '<div class="body">' + md(loc.body) + '</div>';
         html += '<div class="meta">' + version + badges + audience + '<span>📅 ' + e.date + '</span></div>';
         html += '</article>';
       });
@@ -324,18 +425,16 @@ const JS = `
   }
 
   // ---- filters ----
-  const filters = document.getElementById('filters');
   ['all', ...KIND_ORDER].forEach((kind) => {
     const btn = document.createElement('button');
-    btn.className = 'filter' + (kind === 'all' ? ' active' : '');
-    btn.textContent = kind === 'all' ? 'All' : KIND_PLURAL[kind] || KIND_LABEL[kind] + 's';
+    btn.dataset.kind = kind;
     btn.addEventListener('click', () => {
       state.filter = kind;
-      filters.querySelectorAll('.filter').forEach((f) => f.classList.remove('active'));
-      btn.classList.add('active');
+      setChrome();
       render();
     });
     filters.appendChild(btn);
+    filterButtons.push(btn);
   });
 
   const search = document.getElementById('search');
@@ -355,6 +454,7 @@ const JS = `
     toggle.textContent = dark ? '🌙' : '☀️';
   });
 
+  setChrome();
   render();
 })();
 `;
@@ -376,8 +476,8 @@ export function renderPage(document: ChangelogDocument): string {
 <body>
 <header class="hero">
   <div class="hero-inner">
-    <span class="eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
-    <h1>Changelog</h1>
+    <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
+    <h1 id="page-title">Changelog</h1>
     <p class="tagline">${escapeHtml(document.tagline)}</p>
     <div class="summary" id="summary"></div>
   </div>
@@ -389,11 +489,12 @@ export function renderPage(document: ChangelogDocument): string {
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="search" type="search" placeholder="Search entries…" aria-label="Search entries" />
     </label>
+    <div class="langs" id="langs" aria-label="Language"></div>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
   </div>
 </nav>
 <main class="content" id="content"></main>
-<footer>Generated ${new Date(document.generatedAt).toUTCString()} · ${document.entries.filter((e) => e.published).length} published entries</footer>
+<footer id="page-footer">Generated ${new Date(document.generatedAt).toUTCString()} · ${document.entries.filter((e) => e.published).length} published entries</footer>
 <script type="application/json" id="changelog-data">${embedJson(document)}</script>
 <script>${JS}</script>
 </body>

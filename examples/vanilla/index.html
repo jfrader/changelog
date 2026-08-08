@@ -123,6 +123,7 @@
   <script type="module">
     import {
       computeWhatsNew,
+      localize,
       markSeen,
       readSeenDate,
       DEFAULT_SEEN_KEY,
@@ -136,6 +137,9 @@
       chore: "Chore",
     };
 
+    // Simple language detection for the demo (a real app uses its own i18n).
+    const LANG = String(navigator.language || "en").startsWith("es") ? "es" : "en";
+
     const dialog = document.getElementById("whatsnew-dialog");
     const list = document.getElementById("whatsnew-list");
     const seenNote = document.getElementById("seen-note");
@@ -148,13 +152,14 @@
     function renderEntries(entries) {
       list.innerHTML = "";
       for (const entry of entries) {
+        const loc = localize(entry, LANG);
         const card = document.createElement("article");
         card.className = "entry";
         card.dataset.kind = entry.kind;
         card.innerHTML = `
           <span class="badge">${KIND_LABEL[entry.kind] ?? entry.kind}</span>
-          <h3>${entry.title.replace(/</g, "&lt;")}</h3>
-          ${entry.body ? `<p>${entry.body.replace(/</g, "&lt;")}</p>` : ""}
+          <h3>${loc.title.replace(/</g, "&lt;")}</h3>
+          ${loc.body ? `<p>${loc.body.replace(/</g, "&lt;")}</p>` : ""}
         `;
         list.appendChild(card);
       }

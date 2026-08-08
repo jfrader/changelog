@@ -2,7 +2,15 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 08 Aug 2026 00:41:27 GMT from 1 entries._
+_Generated Sat, 08 Aug 2026 03:03:52 GMT from 2 entries._
+
+## 2026-08-08
+
+### Multilingual entries
+
+_New feature · 1.1.0 · `i18n`_
+
+Entries can now carry per-language titles and bodies; the end-user page and the in-app modals render in the reader's language.
 
 ## 2026-08-07
 

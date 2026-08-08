@@ -70,17 +70,32 @@ export async function init(options) {
     }
     return changelogDir;
 }
+function quoteFrontmatter(value) {
+    const needsQuotes = /[:#\[\]{}]/.test(value);
+    return needsQuotes ? JSON.stringify(value) : `"${value.replace(/"/g, '\\"')}"`;
+}
 export async function add(options) {
     const project = await findProject(options.root);
     if (!project) {
         throw new Error(`No changelog found at or above ${path.resolve(options.root)}. Run \`changelog init\` first.`);
     }
     const config = project.config;
+    const defaultLanguage = config.defaultLanguage;
     const date = options.date ?? today();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         throw new Error(`Invalid date "${date}" (expected YYYY-MM-DD).`);
     }
-    const slug = slugify(options.title);
+    // Collect titles: plain `title` feeds the default language; `titleByLang`
+    // provides any extra languages.
+    const titleByLang = { ...(options.titleByLang ?? {}) };
+    if (options.title.trim()) {
+        titleByLang[defaultLanguage] = titleByLang[defaultLanguage] ?? options.title.trim();
+    }
+    const languagesWithTitles = Object.keys(titleByLang);
+    if (languagesWithTitles.length === 0) {
+        throw new Error('error: --title (or --title.<lang>) is required for `add`');
+    }
+    const slug = slugify(titleByLang[defaultLanguage] ?? languagesWithTitles[0]);
     const fileName = entryFileName(date, slug);
     const entriesDir = await entryDirOf(project);
     await fs.mkdir(entriesDir, { recursive: true });
@@ -92,22 +107,44 @@ export async function add(options) {
     const audience = options.audience ?? 'all';
     const version = options.version ?? '';
     const kind = options.kind;
-    const body = options.body?.trim() ?? '';
-    const head = [
+    // Multi-language scaffold when more than one language is provided.
+    const otherLangs = languagesWithTitles.filter((lang) => lang !== defaultLanguage);
+    const isBilingual = otherLangs.length > 0 || Object.keys(options.bodyByLang ?? {}).some((l) => l !== defaultLanguage);
+    const headLines = [
         '---',
         `kind: ${kind}`,
         `date: ${date}`,
-        `title: "${options.title.replace(/"/g, '\\"')}"`,
-        `tags: [${tags.join(', ')}]`,
-        `audience: ${audience}`,
-        `published: ${options.draft ? 'false' : 'true'}`,
-        ...(version ? [`version: ${version}`] : []),
-        '---',
-        '',
-    ].join('\n');
-    const content = body
-        ? `${head}# ${options.title}\n\n${body}\n`
-        : `${head}# ${options.title}\n\n${ENTRY_TEMPLATE.split('\n\n').slice(2).join('\n\n').trim()}\n`;
+    ];
+    if (isBilingual) {
+        for (const lang of languagesWithTitles) {
+            headLines.push(`title.${lang}: ${quoteFrontmatter(titleByLang[lang])}`);
+        }
+    }
+    else {
+        headLines.push(`title: ${quoteFrontmatter(titleByLang[defaultLanguage])}`);
+    }
+    headLines.push(`tags: [${tags.join(', ')}]`, `audience: ${audience}`, `published: ${options.draft ? 'false' : 'true'}`, ...(version ? [`version: ${version}`] : []), '---', '');
+    const head = headLines.join('\n');
+    const placeholder = ENTRY_TEMPLATE.split('\n\n').slice(2).join('\n\n').trim();
+    let content;
+    if (isBilingual) {
+        const sections = [];
+        const defaultBody = options.body?.trim() ?? options.bodyByLang?.[defaultLanguage]?.trim() ?? '';
+        const emit = (lang, body) => {
+            sections.push(body ? `## ${lang}\n${body}` : `## ${lang}`);
+        };
+        emit(defaultLanguage, defaultBody || placeholder);
+        for (const lang of otherLangs) {
+            emit(lang, options.bodyByLang?.[lang]?.trim() ?? '');
+        }
+        content = `${head}${sections.join('\n\n')}\n`;
+    }
+    else {
+        const body = options.body?.trim() ?? '';
+        content = body
+            ? `${head}# ${titleByLang[defaultLanguage]}\n\n${body}\n`
+            : `${head}# ${titleByLang[defaultLanguage]}\n\n${placeholder}\n`;
+    }
     await fs.writeFile(target, content, 'utf8');
     return target;
 }

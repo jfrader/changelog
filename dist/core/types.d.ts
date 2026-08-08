@@ -10,10 +10,16 @@ export interface ChangelogEntry {
     id: string;
     /** Frontmatter `kind`. */
     kind: ChangelogKind;
-    /** Human-facing title (frontmatter `title` or first `# heading`). */
+    /** Default-language title (mirrors `titleByLang[defaultLanguage]`). */
     title: string;
-    /** Markdown body without the title heading. */
+    /** Default-language markdown body (mirrors `bodyByLang[defaultLanguage]`). */
     body: string;
+    /** Language codes this entry provides content for (subset of config.languages). */
+    languages: string[];
+    /** Titles keyed by language code. */
+    titleByLang: Record<string, string>;
+    /** Bodies keyed by language code. */
+    bodyByLang: Record<string, string>;
     /** ISO date YYYY-MM-DD. */
     date: string;
     /** Product slug (from config unless overridden). */
@@ -42,6 +48,10 @@ export interface ChangelogConfig {
     tagline: string;
     /** Accent color for the end-user page (hex). */
     accent: string;
+    /** Language codes entries may provide, e.g. ["en", "es"]. */
+    languages: string[];
+    /** Language used for unmarked/legacy content, the human doc and fallbacks. */
+    defaultLanguage: string;
     /** Where entries live, relative to the changelog root. */
     entryDir: string;
     /** Where build output lives, relative to the changelog root. */
@@ -60,6 +70,10 @@ export interface ChangelogDocument {
     productName: string;
     tagline: string;
     accent: string;
+    /** Language codes the entries may provide. */
+    languages: string[];
+    /** Language used as the default / fallback. */
+    defaultLanguage: string;
     generatedAt: string;
     entries: ChangelogEntry[];
 }

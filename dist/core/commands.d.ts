@@ -12,6 +12,10 @@ export interface AddOptions {
     root: string;
     kind: ChangelogKind;
     title: string;
+    /** Per-language titles, keyed by language code (e.g. { es: "..." }). */
+    titleByLang?: Record<string, string>;
+    /** Per-language bodies, keyed by language code. The default language may use `body`. */
+    bodyByLang?: Record<string, string>;
     date?: string;
     version?: string;
     tags?: string[];

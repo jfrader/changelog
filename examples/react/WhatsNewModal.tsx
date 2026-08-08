@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import changelogData from "../vanilla/changelog.json";
 import {
   computeWhatsNew,
+  localize,
   markSeen,
   readSeenDate,
   DEFAULT_SEEN_KEY,
@@ -43,8 +44,9 @@ const KIND_COLOR: Record<string, string> = {
   chore: "#94a3b8",
 };
 
-export function WhatsNewModal() {
+export function WhatsNewModal({ language }: { language?: string }) {
   const [open, setOpen] = useState(false);
+  const lang = language ?? String(navigator.language || "en").startsWith("es") ? "es" : "en";
 
   // Compute "new since last visit" once per app build.
   const { entries, hasNew } = useMemo(() => {
@@ -101,39 +103,42 @@ export function WhatsNewModal() {
           New in this release
         </h2>
 
-        {entries.map((entry) => (
-          <article
-            key={entry.id}
-            style={{
-              border: "1px solid #e4e7ef",
-              borderLeft: `4px solid ${KIND_COLOR[entry.kind] ?? "#6366f1"}`,
-              borderRadius: 12,
-              padding: "12px 16px",
-              marginBottom: 10,
-            }}
-          >
-            <span
+        {entries.map((entry) => {
+          const loc = localize(entry, lang);
+          return (
+            <article
+              key={entry.id}
               style={{
-                display: "inline-block",
-                marginBottom: 6,
-                padding: "2px 8px",
-                borderRadius: 999,
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "#6366f1",
                 border: "1px solid #e4e7ef",
+                borderLeft: `4px solid ${KIND_COLOR[entry.kind] ?? "#6366f1"}`,
+                borderRadius: 12,
+                padding: "12px 16px",
+                marginBottom: 10,
               }}
             >
-              {KIND_LABEL[entry.kind] ?? entry.kind}
-            </span>
-            <h3 style={{ margin: "0 0 4px", fontSize: 15 }}>{entry.title}</h3>
-            {entry.body ? (
-              <p style={{ margin: 0, fontSize: 13.5, color: "#5c6577" }}>{entry.body}</p>
-            ) : null}
-          </article>
-        ))}
+              <span
+                style={{
+                  display: "inline-block",
+                  marginBottom: 6,
+                  padding: "2px 8px",
+                  borderRadius: 999,
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#6366f1",
+                  border: "1px solid #e4e7ef",
+                }}
+              >
+                {KIND_LABEL[entry.kind] ?? entry.kind}
+              </span>
+              <h3 style={{ margin: "0 0 4px", fontSize: 15 }}>{loc.title}</h3>
+              {loc.body ? (
+                <p style={{ margin: 0, fontSize: 13.5, color: "#5c6577" }}>{loc.body}</p>
+              ) : null}
+            </article>
+          );
+        })}
 
         <div style={{ marginTop: 18, textAlign: "right" }}>
           <button

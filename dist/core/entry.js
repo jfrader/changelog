@@ -37,6 +37,39 @@ export function stripTitle(body) {
     const restLines = [...lines.slice(0, firstNonEmpty), ...lines.slice(firstNonEmpty + 1)];
     return { title, rest: restLines.join('\n').trim() };
 }
+const LANGUAGE_HEADING_RE = /^##\s+([A-Za-z]{2,5})\s*$/;
+/**
+ * Splits a body into per-language sections marked with `## <code>` headings.
+ * Content before the first language heading belongs to the default language
+ * (single-language entries simply have no headings at all).
+ */
+export function parseBodyLanguageSections(body, defaultLanguage) {
+    const byLang = {};
+    const order = [];
+    let currentLang = null;
+    const buffer = [];
+    const flush = () => {
+        const text = buffer.join('\n').trim();
+        buffer.length = 0;
+        if (!text)
+            return;
+        const lang = currentLang ?? defaultLanguage;
+        if (byLang[lang] === undefined)
+            order.push(lang);
+        byLang[lang] = byLang[lang] ? `${byLang[lang]}\n\n${text}` : text;
+    };
+    for (const line of body.split(/\r?\n/)) {
+        const match = LANGUAGE_HEADING_RE.exec(line.trim());
+        if (match) {
+            flush();
+            currentLang = match[1].toLowerCase();
+            continue;
+        }
+        buffer.push(line);
+    }
+    flush();
+    return { byLang, order };
+}
 export function parseEntry(input) {
     const issues = [];
     const { frontmatter, body, hasFrontmatter } = parseFrontmatter(input.source);
@@ -69,12 +102,63 @@ export function parseEntry(input) {
         });
     }
     const published = frontmatter['published'] === undefined ? true : frontmatter['published'] !== false;
-    const { title: titleFromBody, rest } = stripTitle(body);
-    const title = typeof frontmatter['title'] === 'string' && frontmatter['title'].trim()
+    // --- i18n: resolve per-language titles and bodies ---
+    const configLanguages = input.config.languages;
+    const defaultLanguage = input.config.defaultLanguage;
+    // Per-language titles from frontmatter (`title.<lang>`); plain `title` is the
+    // default language.
+    const frontTitleByLang = {};
+    const plainTitle = typeof frontmatter['title'] === 'string' && frontmatter['title'].trim()
         ? frontmatter['title'].trim()
-        : titleFromBody;
+        : undefined;
+    if (plainTitle)
+        frontTitleByLang[defaultLanguage] = plainTitle;
+    for (const [key, value] of Object.entries(frontmatter)) {
+        if (!key.startsWith('title.') || typeof value !== 'string' || !value.trim())
+            continue;
+        const lang = key.slice('title.'.length).toLowerCase();
+        if (!configLanguages.includes(lang)) {
+            issues.push({
+                level: 'warn',
+                message: `Unknown language "${lang}" in title (expected one of ${configLanguages.join(', ')})`,
+            });
+        }
+        frontTitleByLang[lang] = value.trim();
+    }
+    // Body language sections.
+    const { byLang: sectionBodyByLang, order } = parseBodyLanguageSections(body, defaultLanguage);
+    for (const lang of order) {
+        if (!configLanguages.includes(lang)) {
+            issues.push({
+                level: 'warn',
+                message: `Unknown language section "## ${lang}" (expected one of ${configLanguages.join(', ')})`,
+            });
+        }
+    }
+    // Languages this entry actually provides (frontmatter titles or body sections).
+    const langsSet = new Set();
+    for (const lang of [...Object.keys(frontTitleByLang), ...order]) {
+        if (lang)
+            langsSet.add(lang);
+    }
+    if (langsSet.size === 0)
+        langsSet.add(defaultLanguage);
+    const titleByLang = {};
+    const resolvedBodyByLang = {};
+    for (const lang of langsSet) {
+        const section = sectionBodyByLang[lang] ?? '';
+        const { title: heading, rest } = stripTitle(section);
+        titleByLang[lang] = frontTitleByLang[lang] ?? heading ?? '';
+        resolvedBodyByLang[lang] = heading ? rest : section;
+    }
+    const entryLanguages = configLanguages.filter((lang) => langsSet.has(lang));
+    for (const lang of langsSet) {
+        if (!entryLanguages.includes(lang))
+            entryLanguages.push(lang);
+    }
+    const title = titleByLang[defaultLanguage] ?? '';
     if (!title) {
-        issues.push({ level: 'error', message: 'Entry has no title (frontmatter `title` or `# heading`)' });
+        issues.push({ level: 'error', message: 'Entry has no title (frontmatter `title`/`title.<lang>` or `# heading`)' });
     }
     const tags = Array.isArray(frontmatter['tags'])
         ? frontmatter['tags'].map(String)
@@ -82,8 +166,11 @@ export function parseEntry(input) {
     const entry = {
         id: fileNameMatch ? `${fileNameMatch[1]}--${fileNameMatch[2]}` : slugify(title || input.fileName),
         kind: isKnownKind(kind) ? kind : 'chore',
-        title: title ?? input.fileName,
-        body: rest.trim(),
+        title: title || input.fileName,
+        body: resolvedBodyByLang[defaultLanguage] ?? '',
+        languages: entryLanguages,
+        titleByLang,
+        bodyByLang: resolvedBodyByLang,
         date,
         product: typeof frontmatter['product'] === 'string' && frontmatter['product'].trim()
             ? frontmatter['product'].trim()

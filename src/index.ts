@@ -46,12 +46,15 @@ export { startServer } from './server/server.js';
 export {
   computeWhatsNew,
   entriesSince,
+  localize,
   localToday,
+  markSeen,
   markSeenToday,
   readSeenDate,
   shouldShowWhatsNew,
   writeSeenDate,
   DEFAULT_SEEN_KEY,
+  type LocalizedEntry,
   type SeenStorage,
   type WhatsNewState,
 } from './sdk/seen.js';

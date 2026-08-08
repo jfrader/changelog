@@ -10,6 +10,21 @@ import type { ChangelogEntry } from '../core/types.js';
 
 export const DEFAULT_SEEN_KEY = 'changelog.lastSeenDate';
 
+export interface LocalizedEntry {
+  title: string;
+  body: string;
+}
+
+/**
+ * Returns the title/body for a language, falling back to the entry's default
+ * language when that language has no content (empty strings fall back too).
+ */
+export function localize(entry: ChangelogEntry, language: string): LocalizedEntry {
+  const title = entry.titleByLang?.[language] || entry.title;
+  const body = entry.bodyByLang?.[language] || entry.body;
+  return { title, body };
+}
+
 export interface SeenStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;

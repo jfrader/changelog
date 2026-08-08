@@ -6,6 +6,7 @@
 export {
   computeWhatsNew,
   entriesSince,
+  localize,
   localToday,
   markSeen,
   markSeenToday,
@@ -13,6 +14,7 @@ export {
   shouldShowWhatsNew,
   writeSeenDate,
   DEFAULT_SEEN_KEY,
+  type LocalizedEntry,
   type SeenStorage,
   type WhatsNewState,
 } from './seen.js';

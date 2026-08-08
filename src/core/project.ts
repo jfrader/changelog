@@ -10,6 +10,8 @@ export const DEFAULT_CONFIG: ChangelogConfig = {
   productName: 'App',
   tagline: 'What is new and what we fixed',
   accent: '#22c55e',
+  languages: ['en'],
+  defaultLanguage: 'en',
   entryDir: 'entries',
   outDir: '.',
 };

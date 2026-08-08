@@ -103,12 +103,21 @@ export interface AddOptions {
   root: string;
   kind: ChangelogKind;
   title: string;
+  /** Per-language titles, keyed by language code (e.g. { es: "..." }). */
+  titleByLang?: Record<string, string>;
+  /** Per-language bodies, keyed by language code. The default language may use `body`. */
+  bodyByLang?: Record<string, string>;
   date?: string;
   version?: string;
   tags?: string[];
   audience?: string;
   draft?: boolean;
   body?: string;
+}
+
+function quoteFrontmatter(value: string): string {
+  const needsQuotes = /[:#\[\]{}]/.test(value);
+  return needsQuotes ? JSON.stringify(value) : `"${value.replace(/"/g, '\\"')}"`;
 }
 
 export async function add(options: AddOptions): Promise<string> {
@@ -120,11 +129,24 @@ export async function add(options: AddOptions): Promise<string> {
   }
 
   const config = project.config;
+  const defaultLanguage = config.defaultLanguage;
   const date = options.date ?? today();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     throw new Error(`Invalid date "${date}" (expected YYYY-MM-DD).`);
   }
-  const slug = slugify(options.title);
+
+  // Collect titles: plain `title` feeds the default language; `titleByLang`
+  // provides any extra languages.
+  const titleByLang: Record<string, string> = { ...(options.titleByLang ?? {}) };
+  if (options.title.trim()) {
+    titleByLang[defaultLanguage] = titleByLang[defaultLanguage] ?? options.title.trim();
+  }
+  const languagesWithTitles = Object.keys(titleByLang);
+  if (languagesWithTitles.length === 0) {
+    throw new Error('error: --title (or --title.<lang>) is required for `add`');
+  }
+
+  const slug = slugify(titleByLang[defaultLanguage] ?? languagesWithTitles[0]);
   const fileName = entryFileName(date, slug);
   const entriesDir = await entryDirOf(project);
   await fs.mkdir(entriesDir, { recursive: true });
@@ -138,24 +160,52 @@ export async function add(options: AddOptions): Promise<string> {
   const audience = options.audience ?? 'all';
   const version = options.version ?? '';
   const kind = options.kind;
-  const body = options.body?.trim() ?? '';
 
-  const head = [
+  // Multi-language scaffold when more than one language is provided.
+  const otherLangs = languagesWithTitles.filter((lang) => lang !== defaultLanguage);
+  const isBilingual = otherLangs.length > 0 || Object.keys(options.bodyByLang ?? {}).some((l) => l !== defaultLanguage);
+
+  const headLines = [
     '---',
     `kind: ${kind}`,
     `date: ${date}`,
-    `title: "${options.title.replace(/"/g, '\\"')}"`,
+  ];
+  if (isBilingual) {
+    for (const lang of languagesWithTitles) {
+      headLines.push(`title.${lang}: ${quoteFrontmatter(titleByLang[lang])}`);
+    }
+  } else {
+    headLines.push(`title: ${quoteFrontmatter(titleByLang[defaultLanguage])}`);
+  }
+  headLines.push(
     `tags: [${tags.join(', ')}]`,
     `audience: ${audience}`,
     `published: ${options.draft ? 'false' : 'true'}`,
     ...(version ? [`version: ${version}`] : []),
     '---',
     '',
-  ].join('\n');
+  );
+  const head = headLines.join('\n');
 
-  const content = body
-    ? `${head}# ${options.title}\n\n${body}\n`
-    : `${head}# ${options.title}\n\n${ENTRY_TEMPLATE.split('\n\n').slice(2).join('\n\n').trim()}\n`;
+  const placeholder = ENTRY_TEMPLATE.split('\n\n').slice(2).join('\n\n').trim();
+  let content: string;
+  if (isBilingual) {
+    const sections: string[] = [];
+    const defaultBody = options.body?.trim() ?? options.bodyByLang?.[defaultLanguage]?.trim() ?? '';
+    const emit = (lang: string, body: string) => {
+      sections.push(body ? `## ${lang}\n${body}` : `## ${lang}`);
+    };
+    emit(defaultLanguage, defaultBody || placeholder);
+    for (const lang of otherLangs) {
+      emit(lang, options.bodyByLang?.[lang]?.trim() ?? '');
+    }
+    content = `${head}${sections.join('\n\n')}\n`;
+  } else {
+    const body = options.body?.trim() ?? '';
+    content = body
+      ? `${head}# ${titleByLang[defaultLanguage]}\n\n${body}\n`
+      : `${head}# ${titleByLang[defaultLanguage]}\n\n${placeholder}\n`;
+  }
 
   await fs.writeFile(target, content, 'utf8');
   return target;

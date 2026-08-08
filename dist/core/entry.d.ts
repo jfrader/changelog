@@ -13,6 +13,15 @@ export interface ParseEntryInput {
     source: string;
     config: ChangelogConfig;
 }
+/**
+ * Splits a body into per-language sections marked with `## <code>` headings.
+ * Content before the first language heading belongs to the default language
+ * (single-language entries simply have no headings at all).
+ */
+export declare function parseBodyLanguageSections(body: string, defaultLanguage: string): {
+    byLang: Record<string, string>;
+    order: string[];
+};
 export declare function parseEntry(input: ParseEntryInput): {
     entry?: ChangelogEntry;
     issues: {
