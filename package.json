@@ -44,7 +44,8 @@
       "types": "./dist/sdk/index.d.ts",
       "import": "./dist/sdk/index.js",
       "default": "./dist/sdk/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
