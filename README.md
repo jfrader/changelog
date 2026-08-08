@@ -118,6 +118,12 @@ The SDK has no Node or DOM dependencies — only a tiny storage interface — so
 it works in React, Vue, Svelte, or vanilla JS. You render the modal shell in
 your own UI and design tokens.
 
+## Examples
+
+See [`examples/`](examples/README.md) for a runnable **vanilla** "What's New"
+modal (open the HTML in a browser, no build step) and a **React** reference
+component, both driven by the SDK.
+
 ## Agent MD system
 
 Each initialized project gets:
