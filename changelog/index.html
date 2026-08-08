@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>changelog — Changelog</title>
+<meta name="description" content="What is new in the changelog tool" />
+<style>
+:root {
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-2: #f1f3f6;
+  --text: #1c2330;
+  --text-soft: #5b6472;
+  --text-faint: #8a93a2;
+  --line: #e5e8ee;
+  --accent: #8b5cf6;
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, white);
+  --badge-feature: var(--accent);
+  --badge-improvement: #0ea5e9;
+  --badge-fix: #f59e0b;
+  --badge-breaking: #ef4444;
+  --badge-chore: #94a3b8;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 8px 24px -12px rgba(16, 24, 40, .14);
+  --radius: 14px;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --bg: #0f141c;
+  --panel: #171e29;
+  --panel-2: #1d2531;
+  --text: #e8edf4;
+  --text-soft: #aab4c2;
+  --text-faint: #7c8796;
+  --line: #26303d;
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 28px -14px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); }
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 44px 20px 28px;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(1000px 260px at 20% -40%, var(--accent-soft), transparent 60%),
+    var(--bg);
+}
+.hero-inner { max-width: 860px; margin: 0 auto; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+h1 { margin: 10px 0 6px; font-size: 30px; line-height: 1.15; letter-spacing: -.02em; }
+.tagline { margin: 0; color: var(--text-soft); font-size: 15px; }
+.summary {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--line);
+  font-size: 12.5px; color: var(--text-soft);
+}
+.chip b { color: var(--text); }
+.chip .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+.toolbar {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 20px;
+}
+.toolbar-inner { max-width: 860px; margin: 0 auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter {
+  border: 1px solid var(--line); background: var(--panel); color: var(--text-soft);
+  padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+  transition: all .15s ease; font-family: inherit;
+}
+.filter:hover { border-color: var(--accent); color: var(--text); }
+.filter.active {
+  background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600;
+}
+.search {
+  margin-left: auto; flex: 1 1 180px; max-width: 260px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px;
+}
+.search svg { width: 15px; height: 15px; stroke: var(--text-faint); flex: none; }
+.search input {
+  width: 100%; border: 0; background: transparent; color: var(--text);
+  font: inherit; padding: 8px 0; outline: none;
+}
+.theme-toggle {
+  border: 1px solid var(--line); background: var(--panel); color: var(--text-soft);
+  width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 16px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center; font-family: inherit;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--text); }
+
+.content { max-width: 860px; margin: 0 auto; padding: 26px 20px 60px; }
+
+.day { margin-bottom: 30px; }
+.day-head {
+  display: flex; align-items: center; gap: 12px; margin: 0 0 12px;
+  font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint);
+}
+.day-head::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.card {
+  position: relative;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px 20px 16px 22px; margin-bottom: 12px; box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--kind-color, var(--accent));
+}
+.card.is-feature { --kind-color: var(--badge-feature); }
+.card.is-improvement { --kind-color: var(--badge-improvement); }
+.card.is-fix { --kind-color: var(--badge-fix); }
+.card.is-breaking { --kind-color: var(--badge-breaking); }
+.card.is-chore { --kind-color: var(--badge-chore); }
+
+.card-head { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.badge {
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; flex: none;
+  background: var(--kind-soft, var(--accent-soft)); color: var(--kind-color, var(--accent));
+}
+.card.is-feature { --kind-soft: var(--accent-soft); }
+.card.is-improvement { --kind-soft: color-mix(in srgb, var(--badge-improvement) 14%, transparent); }
+.card.is-fix { --kind-soft: color-mix(in srgb, var(--badge-fix) 14%, transparent); }
+.card.is-breaking { --kind-soft: color-mix(in srgb, var(--badge-breaking) 14%, transparent); }
+.card.is-chore { --kind-soft: color-mix(in srgb, var(--badge-chore) 14%, transparent); }
+
+.card h3 { margin: 6px 0 4px; font-size: 17px; line-height: 1.3; letter-spacing: -.01em; }
+.whats-new {
+  display: inline-flex; align-items: center; gap: 5px; margin-left: 8px;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 8px;
+  vertical-align: 2px;
+}
+.whats-new .pulse {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+
+.body { color: var(--text-soft); font-size: 14.5px; margin-top: 8px; }
+.body p { margin: 0 0 8px; }
+.body ul, .body ol { margin: 0 0 8px; padding-left: 20px; }
+.body li { margin: 2px 0; }
+.body code {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px;
+  padding: 1px 5px; font-size: .9em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.body a { text-decoration: none; }
+.body a:hover { text-decoration: underline; }
+
+.meta {
+  display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center;
+  margin-top: 12px; font-size: 12px; color: var(--text-faint);
+}
+.meta .tag {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px;
+  padding: 2px 9px; color: var(--text-soft);
+}
+.meta .audience::before { content: "👤 "; }
+
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-faint);
+  border: 1px dashed var(--line); border-radius: var(--radius);
+}
+.empty .big { font-size: 34px; margin-bottom: 8px; }
+
+footer { max-width: 860px; margin: 0 auto; padding: 0 20px 40px; color: var(--text-faint); font-size: 12px; }
+@media (max-width: 620px) {
+  h1 { font-size: 24px; }
+  .hero { padding: 32px 16px 22px; }
+  .toolbar-inner { flex-direction: column; align-items: stretch; }
+  .search { max-width: none; }
+  .theme-toggle { align-self: flex-end; }
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="dot"></span>changelog · What's new</span>
+    <h1>Changelog</h1>
+    <p class="tagline">What is new in the changelog tool</p>
+    <div class="summary" id="summary"></div>
+  </div>
+</header>
+<nav class="toolbar">
+  <div class="toolbar-inner">
+    <div class="filters" id="filters"></div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Search entries…" aria-label="Search entries" />
+    </label>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</nav>
+<main class="content" id="content"></main>
+<footer>Generated Sat, 08 Aug 2026 00:41:27 GMT · 1 published entries</footer>
+<script type="application/json" id="changelog-data">{"schema":1,"product":"changelog","productName":"changelog","tagline":"What is new in the changelog tool","accent":"#8b5cf6","generatedAt":"2026-08-08T00:41:27.263Z","entries":[{"id":"2026-08-07--first-public-release","kind":"feature","title":"First public release","body":"Zero-dependency changelog system: markdown entries, an agent-facing MD workflow, a build, a tiny serve backend, and a browser-safe in-app What's New SDK.","date":"2026-08-07","product":"changelog","productName":"changelog","version":"1.0.0","tags":["release"],"audience":"all","published":true,"fileName":"2026-08-07--first-public-release.md","relPath":"entries/2026-08-07--first-public-release.md"}]}</script>
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('changelog-data').textContent);
+  const accent = data.accent || '#22c55e';
+  document.documentElement.style.setProperty('--accent', accent);
+
+  const KIND_LABEL = { feature: 'New feature', improvement: 'Improvement', fix: 'Fix', breaking: 'Breaking change', chore: 'Chore' };
+  const KIND_PLURAL = { feature: 'new features', improvement: 'improvements', fix: 'fixes', breaking: 'breaking changes', chore: 'chores' };
+  const KIND_ORDER = ['feature', 'improvement', 'fix', 'breaking', 'chore'];
+
+  const state = { filter: 'all', query: '' };
+
+  // ---- tiny safe markdown renderer ----
+  function md(text) {
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const inline = (s) =>
+      esc(s)
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
+    const blocks = text.split(/\n\n+/);
+    return blocks.map((block) => {
+      const trimmed = block.trim();
+      if (!trimmed) return '';
+      if (/^[-*]\s+/.test(trimmed)) {
+        const items = trimmed.split(/\n/).filter((l) => /^[-*]\s+/.test(l.trim()));
+        return '<ul>' + items.map((li) => '<li>' + inline(li.replace(/^[-*]\s+/, '')) + '</li>').join('') + '</ul>';
+      }
+      if (/^\d+\.\s+/.test(trimmed)) {
+        const items = trimmed.split(/\n/).filter((l) => /^\d+\.\s+/.test(l.trim()));
+        return '<ol>' + items.map((li) => '<li>' + inline(li.replace(/^\d+\.\s+/, '')) + '</li>').join('') + '</ol>';
+      }
+      return '<p>' + inline(trimmed) + '</p>';
+    }).join('');
+  }
+
+  // ---- state ----
+  function visibleEntries() {
+    return data.entries
+      .filter((e) => e.published !== false)
+      .filter((e) => state.filter === 'all' || e.kind === state.filter)
+      .filter((e) => {
+        if (!state.query) return true;
+        const q = state.query.toLowerCase();
+        return (e.title + ' ' + e.body + ' ' + e.tags.join(' ') + ' ' + (e.version || '')).toLowerCase().includes(q);
+      });
+  }
+
+  // ---- render ----
+  const content = document.getElementById('content');
+  function render() {
+    const entries = visibleEntries();
+    const counts = {};
+    data.entries.filter((e) => e.published !== false).forEach((e) => { counts[e.kind] = (counts[e.kind] || 0) + 1; });
+
+    const summary = document.getElementById('summary');
+    summary.innerHTML = '';
+    KIND_ORDER.forEach((kind) => {
+      const n = counts[kind] || 0;
+      if (!n) return;
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      const swatch = document.createElement('span');
+      swatch.className = 'swatch';
+      swatch.style.background = getComputedStyle(document.documentElement).getPropertyValue('--badge-' + kind);
+      chip.appendChild(swatch);
+      const b = document.createElement('b');
+      b.textContent = n;
+      chip.appendChild(b);
+      chip.appendChild(document.createTextNode(' ' + (n === 1 ? KIND_LABEL[kind].toLowerCase() : KIND_PLURAL[kind])));
+      summary.appendChild(chip);
+    });
+
+    if (entries.length === 0) {
+      content.innerHTML = '<div class="empty"><div class="big">🔍</div>No entries match your search.</div>';
+      return;
+    }
+
+    const latestFeatureId = data.entries.find((e) => e.kind === 'feature' && e.published !== false)?.id;
+
+    const byDate = new Map();
+    entries.forEach((e) => {
+      const list = byDate.get(e.date) || [];
+      list.push(e);
+      byDate.set(e.date, list);
+    });
+
+    let html = '';
+    byDate.forEach((list, date) => {
+      const [y, m, d] = date.split('-');
+      const label = new Date(Date.UTC(+y, +m - 1, +d)).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+      html += '<section class="day"><h2 class="day-head">' + label + '</h2>';
+      list.forEach((e) => {
+        const isNew = e.id === latestFeatureId;
+        const badges = (e.tags || []).map((t) => '<span class="tag">' + t.replace(/</g, '&lt;') + '</span>').join('');
+        const version = e.version ? '<span class="tag">v' + e.version + '</span>' : '';
+        const audience = e.audience && e.audience !== 'all' ? '<span class="audience">' + e.audience + '</span>' : '';
+        html += '<article class="card is-' + e.kind + '">';
+        html += '<div class="card-head"><span class="badge">' + KIND_LABEL[e.kind] + '</span>';
+        html += '<h3>' + e.title.replace(/</g, '&lt;') + (isNew ? '<span class="whats-new"><span class="pulse"></span>New</span>' : '') + '</h3></div>';
+        if (e.body) html += '<div class="body">' + md(e.body) + '</div>';
+        html += '<div class="meta">' + version + badges + audience + '<span>📅 ' + e.date + '</span></div>';
+        html += '</article>';
+      });
+      html += '</section>';
+    });
+    content.innerHTML = html;
+  }
+
+  // ---- filters ----
+  const filters = document.getElementById('filters');
+  ['all', ...KIND_ORDER].forEach((kind) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter' + (kind === 'all' ? ' active' : '');
+    btn.textContent = kind === 'all' ? 'All' : KIND_PLURAL[kind] || KIND_LABEL[kind] + 's';
+    btn.addEventListener('click', () => {
+      state.filter = kind;
+      filters.querySelectorAll('.filter').forEach((f) => f.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+    filters.appendChild(btn);
+  });
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => { state.query = search.value; render(); });
+
+  // ---- theme ----
+  const toggle = document.getElementById('theme-toggle');
+  const saved = localStorage.getItem('changelog-theme');
+  const preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && preferDark)) document.documentElement.setAttribute('data-theme', 'dark');
+  toggle.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  toggle.addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('changelog-theme', dark ? 'light' : 'dark');
+    toggle.textContent = dark ? '🌙' : '☀️';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

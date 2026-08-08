@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "product": "changelog",
+  "productName": "changelog",
+  "tagline": "What is new in the changelog tool",
+  "accent": "#8b5cf6",
+  "generatedAt": "2026-08-08T00:41:27.263Z",
+  "entries": [
+    {
+      "id": "2026-08-07--first-public-release",
+      "kind": "feature",
+      "title": "First public release",
+      "body": "Zero-dependency changelog system: markdown entries, an agent-facing MD workflow, a build, a tiny serve backend, and a browser-safe in-app What's New SDK.",
+      "date": "2026-08-07",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.0.0",
+      "tags": [
+        "release"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-07--first-public-release.md",
+      "relPath": "entries/2026-08-07--first-public-release.md"
+    }
+  ]
+}
