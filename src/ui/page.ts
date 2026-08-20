@@ -110,14 +110,14 @@ h1 { margin: 10px 0 6px; font-size: 30px; line-height: 1.15; letter-spacing: -.0
   background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600;
 }
 .search {
-  margin-left: auto; flex: 1 1 180px; max-width: 260px;
+  margin-left: auto; flex: 1 1 180px; min-width: 0; max-width: 260px; height: 36px;
   display: flex; align-items: center; gap: 8px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px;
 }
 .search svg { width: 15px; height: 15px; stroke: var(--text-faint); flex: none; }
 .search input {
-  width: 100%; border: 0; background: transparent; color: var(--text);
-  font: inherit; padding: 8px 0; outline: none;
+  width: 100%; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text);
+  font: inherit; line-height: normal; padding: 0; outline: none;
 }
 .theme-toggle {
   border: 1px solid var(--line); background: var(--panel); color: var(--text-soft);
@@ -126,7 +126,7 @@ h1 { margin: 10px 0 6px; font-size: 30px; line-height: 1.15; letter-spacing: -.0
 }
 .theme-toggle:hover { border-color: var(--accent); color: var(--text); }
 
-.langs { display: flex; gap: 4px; }
+.langs { display: flex; flex-wrap: wrap; min-width: 0; gap: 4px; }
 .lang {
   border: 1px solid var(--line); background: var(--panel); color: var(--text-soft);
   height: 36px; padding: 0 10px; border-radius: 10px; cursor: pointer;
@@ -218,9 +218,18 @@ footer { max-width: 860px; margin: 0 auto; padding: 0 20px 40px; color: var(--te
 @media (max-width: 620px) {
   h1 { font-size: 24px; }
   .hero { padding: 32px 16px 22px; }
-  .toolbar-inner { flex-direction: column; align-items: stretch; }
-  .search { max-width: none; }
-  .theme-toggle { align-self: flex-end; }
+  .toolbar { padding: 10px 16px; }
+  .toolbar-inner {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  }
+  .filters { grid-column: 1 / -1; grid-row: 1; }
+  .search {
+    grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; height: 40px;
+    margin-left: 0; flex: none;
+  }
+  .langs { grid-column: 1; grid-row: 3; }
+  .lang, .theme-toggle { height: 40px; }
+  .theme-toggle { grid-column: 2; grid-row: 3; justify-self: end; align-self: center; }
 }
 `;
 

@@ -131,7 +131,9 @@ The end-user page is a plain static bundle: `changelog/index.html` +
 static content:
 
 - **Static host**: copy both files to the public web root (e.g. a `/changelog`
-  folder on the site's CDN or web server).
+  folder on the site's CDN or web server). Before any SPA catch-all, add an
+  exact internal rewrite from `/changelog` to `/changelog/index.html` so the
+  clean URL serves the generated page without exposing the file name.
 - **Backend**: run `changelog serve` behind the existing reverse proxy, or
   mount the generated `changelog/` folder in the web container.
 - **In-app**: fetch `changelog.json` from the app and render a "What's new"
@@ -155,5 +157,6 @@ policy check, not something the tool decides for you).
 | Entry skipped with "Missing frontmatter" | Add the `---` block via `changelog add`. |
 | Entry skipped with "Invalid date" | Use `YYYY-MM-DD`. |
 | Page shows stale data | Re-run `changelog build`. |
+| `/changelog` opens the SPA or a 404 | Add an exact internal rewrite to `/changelog/index.html` before the SPA catch-all. |
 | `changelog` command not found | Install the library or call it via `npx`/absolute path. |
 | Port already in use | `changelog serve --port 0` picks a free port. |

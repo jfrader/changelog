@@ -142,6 +142,10 @@ test('full init → add → build → serve-less flow', async () => {
   for (const file of ['README.md', 'RUNBOOK.md', 'SKILL.md', 'AGENTS.snippet.md', 'CHANGELOG.md', 'config.json']) {
     await fs.access(path.join(project.changelogDir, file));
   }
+  const skill = await fs.readFile(path.join(project.changelogDir, 'SKILL.md'), 'utf8');
+  assert.match(skill, /`kind` controls the category shown/u);
+  assert.match(skill, /material simulation-engine behavior/u);
+  assert.match(skill, /`tags` only describe topics/u);
 
   const first = await add({
     root,
@@ -239,6 +243,16 @@ test('renderPage embeds JSON safely', async () => {
   const html = renderPage(document);
   assert.ok(!html.includes('</script><script>alert'), 'script tag must be escaped in embedded JSON');
   assert.ok(html.includes('<\\/script>'));
+});
+
+test('standalone page keeps the mobile toolbar compact and aligned', () => {
+  const html = renderPage(standaloneDocument({}));
+
+  assert.match(html, /\.search \{\s+margin-left: auto; flex: 1 1 180px; min-width: 0; max-width: 260px; height: 36px;/u);
+  assert.match(html, /@media \(max-width: 620px\) \{[\s\S]*?\.toolbar-inner \{\s+display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/u);
+  assert.match(html, /\.search \{\s+grid-column: 1 \/ -1; grid-row: 2; width: 100%; max-width: none; height: 40px;\s+margin-left: 0; flex: none;/u);
+  assert.match(html, /\.langs \{ display: flex; flex-wrap: wrap; min-width: 0; gap: 4px; \}/u);
+  assert.match(html, /\.theme-toggle \{ grid-column: 2; grid-row: 3; justify-self: end; align-self: center; \}/u);
 });
 
 test('standalone page sanitizes markdown link destinations', () => {

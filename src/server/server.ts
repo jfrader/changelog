@@ -87,7 +87,13 @@ export async function startServer(project: ChangelogProject, options: ServeOptio
       }
 
       let filePath: string;
-      if (pathname === '/' || pathname === '/index.html') {
+      if (
+        pathname === '/' ||
+        pathname === '/index.html' ||
+        pathname === '/changelog' ||
+        pathname === '/changelog/' ||
+        pathname === '/changelog/index.html'
+      ) {
         filePath = path.join(outDir, 'index.html');
       } else {
         filePath = path.join(outDir, pathname);
