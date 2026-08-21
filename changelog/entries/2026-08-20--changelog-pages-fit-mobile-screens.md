@@ -6,6 +6,7 @@ title.es: "Las novedades se adaptan a celulares"
 tags: [ui, mobile, hosting]
 audience: all
 published: true
+version: 1.2.0
 ---
 
 ## en

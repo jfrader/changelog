@@ -2,13 +2,13 @@
 
 > What is new in the changelog tool
 
-_Generated Thu, 20 Aug 2026 22:01:15 GMT from 8 entries._
+_Generated Fri, 21 Aug 2026 04:44:50 GMT from 8 entries._
 
 ## 2026-08-20
 
 ### Changelog pages fit mobile screens
 
-_Fix · `ui` `mobile` `hosting`_
+_Fix · 1.2.0 · `ui` `mobile` `hosting`_
 
 The full changelog search and controls stay compact and aligned on phones. The
 included server now opens that page at clean `/changelog` URLs.
