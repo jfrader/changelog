@@ -69,7 +69,11 @@ export async function startServer(project, options) {
                 return;
             }
             let filePath;
-            if (pathname === '/' || pathname === '/index.html') {
+            if (pathname === '/' ||
+                pathname === '/index.html' ||
+                pathname === '/changelog' ||
+                pathname === '/changelog/' ||
+                pathname === '/changelog/index.html') {
                 filePath = path.join(outDir, 'index.html');
             }
             else {

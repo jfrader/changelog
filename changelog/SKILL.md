@@ -31,17 +31,41 @@ entry. When in doubt, leave it out — a missing entry is a non-event; a junk
 entry misleads users. Exceptions require an explicit user request to log an
 internal change. Never invent an entry.
 
+## Choose the kind
+
+Choose from the user's point of view. `kind` controls the category shown in
+the changelog; `tags` only describe topics and never replace the one `kind`.
+
+- `feature`: a new capability; established behavior and rules remain intact.
+- `improvement`: an existing capability works better without changing what
+  users must understand or decide.
+- `fix`: restores already-intended behavior. Do not use it merely because new
+  behavior is more realistic or preferable.
+- `breaking`: the user-facing **important change** category. Use it when
+  established rules, outcomes, workflows, stored state, or compatibility
+  change materially enough that returning users may be surprised or must
+  adapt. Examples include material simulation-engine behavior, economy/debt
+  rules, new deadlines or locks, removals, resets, and forced re-authentication.
+- `chore`: a rare user-visible maintenance notice. Internal chores still get
+  no entry.
+
+If a change both adds something and materially changes established behavior,
+`breaking` wins. An internal engine version bump is not automatically
+breaking; use it when the version changes user-visible outcomes or the meaning
+of their decisions, not for refactors or visual-only work.
+
 ## Workflow
 
-1. When a user-visible change is part of the task, scaffold an entry:
+1. Choose the kind using the impact rules above.
+2. When a user-visible change is part of the task, scaffold an entry:
    `changelog add --title "..." --kind feature|improvement|fix|breaking`
    (run from the repository root; the tool walks up to find `changelog/`).
-2. Open the created `entries/YYYY-MM-DD--slug.md` and fill the body with
+3. Open the created `entries/YYYY-MM-DD--slug.md` and fill the body with
    brief, literal end-user copy in the product's voice. Keep titles short.
-3. Commit the entry together with the change it describes.
-4. Before shipping (and whenever asked), run `changelog build` so
+4. Commit the entry together with the change it describes.
+5. Before shipping (and whenever asked), run `changelog build` so
    `CHANGELOG.md`, `changelog.json`, and `index.html` are current.
-5. Only publish/serve when the user asks (serve = `changelog serve`).
+6. Only publish/serve when the user asks (serve = `changelog serve`).
 
 ## Format reminder
 

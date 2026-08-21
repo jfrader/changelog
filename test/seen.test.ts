@@ -91,8 +91,9 @@ test('markSeen stores the latest of local date and newest entry date', () => {
   const storage = memoryStorage();
   const entries = [makeEntry({ date: '2026-08-08' }), makeEntry({ id: 'z', date: '2026-08-09' })];
   const seen = markSeen(storage, entries);
-  assert.equal(seen, '2026-08-09');
-  assert.equal(readSeenDate(storage), '2026-08-09');
+  const expected = localToday() > '2026-08-09' ? localToday() : '2026-08-09';
+  assert.equal(seen, expected);
+  assert.equal(readSeenDate(storage), expected);
   // After marking, the shown entries never reappear, even behind UTC.
   assert.equal(shouldShowWhatsNew(entries, readSeenDate(storage)), false);
 });

@@ -96,6 +96,11 @@ It includes:
 - search, a "New" pulse on the latest feature, and a dark/light theme toggle;
 - a safe mini-Markdown renderer for entry bodies.
 
+Use `/changelog` as the public URL. On static SPA hosts, add an exact internal
+rewrite from `/changelog` to `/changelog/index.html` before the SPA catch-all;
+the built-in server already serves the page at both paths. An internal rewrite
+keeps the clean URL visible instead of redirecting visitors to the file name.
+
 ## Backend
 
 `changelog serve` is a zero-dependency `node:http` server:

@@ -9,8 +9,38 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-08-08T16:12:44.167Z",
+  "generatedAt": "2026-08-20T22:01:15.042Z",
   "entries": [
+    {
+      "id": "2026-08-20--changelog-pages-fit-mobile-screens",
+      "kind": "fix",
+      "title": "Changelog pages fit mobile screens",
+      "body": "The full changelog search and controls stay compact and aligned on phones. The\nincluded server now opens that page at clean `/changelog` URLs.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "en": "Changelog pages fit mobile screens",
+        "es": "Las novedades se adaptan a celulares"
+      },
+      "bodyByLang": {
+        "en": "The full changelog search and controls stay compact and aligned on phones. The\nincluded server now opens that page at clean `/changelog` URLs.",
+        "es": "La búsqueda y los controles de la página completa de novedades se mantienen\ncompactos y alineados en celulares. El servidor incluido ahora abre esa página\nen rutas limpias `/changelog`."
+      },
+      "date": "2026-08-20",
+      "product": "changelog",
+      "productName": "changelog",
+      "tags": [
+        "ui",
+        "mobile",
+        "hosting"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-08-20--changelog-pages-fit-mobile-screens.md",
+      "relPath": "entries/2026-08-20--changelog-pages-fit-mobile-screens.md"
+    },
     {
       "id": "2026-08-08--what-s-new-remembers-every-release",
       "kind": "fix",
