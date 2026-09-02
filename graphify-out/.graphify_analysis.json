@@ -11,7 +11,6 @@
       "src_cli_readpackageversion",
       "src_cli_str",
       "src_cli_version",
-      "src_core_build_buildproject",
       "src_core_build_writebuildoutputs",
       "src_core_commands",
       "src_core_commands_add",
@@ -24,7 +23,6 @@
       "src_core_commands_quotefrontmatter",
       "src_core_commands_serve",
       "src_core_commands_serveoptions",
-      "src_core_commands_today",
       "src_core_project",
       "src_core_project_config_file",
       "src_core_project_configexists",
@@ -42,6 +40,13 @@
       "src_core_types_changelogkind",
       "src_core_types_kind_order",
       "src_server_server_startserver",
+      "src_ui_page",
+      "src_ui_page_embedjson",
+      "src_ui_page_escapehtml",
+      "src_ui_page_renderpage",
+      "test_build_test",
+      "test_build_test_makeroot",
+      "test_build_test_standalonedocument",
       "test_server_test"
     ],
     "1": [
@@ -63,7 +68,6 @@
       "package_files",
       "package_homepage",
       "package_json_ref_dist",
-      "package_keywords",
       "package_license",
       "package_main",
       "package_name",
@@ -73,21 +77,26 @@
       "package_repository",
       "package_repository_type",
       "package_repository_url",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_check",
+      "package_scripts_clean",
+      "package_scripts_dev",
+      "package_scripts_prepare",
+      "package_scripts_prepublish",
+      "package_scripts_prepublishonly",
+      "package_scripts_test",
+      "package_scripts_test_watch",
+      "package_scripts_typecheck",
       "package_sdk_default",
       "package_sdk_import",
       "package_sdk_types",
       "package_type",
       "package_types",
-      "package_version",
-      "ref_changelog",
-      "ref_cli",
-      "ref_frontmatter",
-      "ref_markdown",
-      "ref_release",
-      "ref_release_notes",
-      "ref_whats_new"
+      "package_version"
     ],
     "2": [
+      "src_core_commands_today",
       "src_core_types_changelogaudience",
       "src_core_types_changelogentry",
       "src_index",
@@ -124,35 +133,29 @@
       "test_seen_test_setitem"
     ],
     "3": [
-      "promises",
-      "src_core_build",
-      "src_core_render_md",
-      "src_core_render_md_badge",
-      "src_core_render_md_kind_label",
-      "src_core_render_md_rendermarkdown",
-      "src_core_types",
-      "src_core_types_audiences",
-      "src_core_types_buildissue",
-      "src_core_types_buildresult",
-      "src_core_types_changelogdocument",
-      "src_core_types_changelogproject",
-      "src_server_server",
-      "src_server_server_mime",
-      "src_server_server_serveoptions",
-      "src_ui_page",
-      "src_ui_page_embedjson",
-      "src_ui_page_escapehtml",
-      "src_ui_page_renderpage",
-      "test_build_test",
-      "test_build_test_makeroot",
-      "test_build_test_pageelement",
-      "test_build_test_pageelement_addeventlistener",
-      "test_build_test_pageelement_appendchild",
-      "test_build_test_pageelement_getattribute",
-      "test_build_test_pageelement_removeattribute",
-      "test_build_test_pageelement_setattribute",
-      "test_build_test_runstandalonepage",
-      "test_build_test_standalonedocument"
+      "src_core_entry",
+      "src_core_entry_entry_pattern",
+      "src_core_entry_entryfilename",
+      "src_core_entry_isknownaudience",
+      "src_core_entry_isknownkind",
+      "src_core_entry_parsebodylanguagesections",
+      "src_core_entry_parseentry",
+      "src_core_entry_parseentryinput",
+      "src_core_entry_slugify",
+      "src_core_entry_striptitle",
+      "src_core_frontmatter",
+      "src_core_frontmatter_coerce",
+      "src_core_frontmatter_frontmatter",
+      "src_core_frontmatter_parsefrontmatter",
+      "src_core_frontmatter_serializefrontmatter",
+      "src_core_frontmatter_splitlist",
+      "src_core_project_default_config",
+      "src_core_types_changelogconfig",
+      "test_entry_test",
+      "test_entry_test_config",
+      "test_frontmatter_test",
+      "test_i18n_test",
+      "test_i18n_test_config"
     ],
     "4": [
       "ref_es2022",
@@ -179,38 +182,24 @@
       "tsconfig_json_ref_dist"
     ],
     "5": [
-      "src_core_entry",
-      "src_core_entry_entry_pattern",
-      "src_core_entry_entryfilename",
-      "src_core_entry_isknownaudience",
-      "src_core_entry_isknownkind",
-      "src_core_entry_parsebodylanguagesections",
-      "src_core_entry_parseentry",
-      "src_core_entry_parseentryinput",
+      "src_core_build",
+      "src_core_build_buildproject",
       "src_core_entry_readentries",
-      "src_core_entry_slugify",
-      "src_core_entry_striptitle",
-      "src_core_project_default_config",
-      "src_core_types_changelogconfig",
-      "test_entry_test",
-      "test_entry_test_config",
-      "test_i18n_test",
-      "test_i18n_test_config"
+      "src_core_render_md",
+      "src_core_render_md_badge",
+      "src_core_render_md_kind_label",
+      "src_core_render_md_rendermarkdown",
+      "src_core_types",
+      "src_core_types_audiences",
+      "src_core_types_buildissue",
+      "src_core_types_buildresult",
+      "src_core_types_changelogdocument",
+      "src_core_types_changelogproject",
+      "src_server_server",
+      "src_server_server_mime",
+      "src_server_server_serveoptions"
     ],
     "6": [
-      "package_scripts",
-      "package_scripts_build",
-      "package_scripts_check",
-      "package_scripts_clean",
-      "package_scripts_dev",
-      "package_scripts_prepare",
-      "package_scripts_prepublish",
-      "package_scripts_prepublishonly",
-      "package_scripts_test",
-      "package_scripts_test_watch",
-      "package_scripts_typecheck"
-    ],
-    "7": [
       "package_devdependencies",
       "package_devdependencies_rimraf",
       "package_devdependencies_tsx",
@@ -220,6 +209,16 @@
       "tsx",
       "types_node",
       "typescript"
+    ],
+    "7": [
+      "package_keywords",
+      "ref_changelog",
+      "ref_cli",
+      "ref_frontmatter",
+      "ref_markdown",
+      "ref_release",
+      "ref_release_notes",
+      "ref_whats_new"
     ],
     "8": [
       "scripts_publish_registry",
@@ -231,13 +230,13 @@
       "scripts_publish_registry_readpublishedintegrity"
     ],
     "9": [
-      "src_core_frontmatter",
-      "src_core_frontmatter_coerce",
-      "src_core_frontmatter_frontmatter",
-      "src_core_frontmatter_parsefrontmatter",
-      "src_core_frontmatter_serializefrontmatter",
-      "src_core_frontmatter_splitlist",
-      "test_frontmatter_test"
+      "test_build_test_pageelement",
+      "test_build_test_pageelement_addeventlistener",
+      "test_build_test_pageelement_appendchild",
+      "test_build_test_pageelement_getattribute",
+      "test_build_test_pageelement_removeattribute",
+      "test_build_test_pageelement_setattribute",
+      "test_build_test_runstandalonepage"
     ],
     "10": [
       "examples_react_whatsnewmodal",
@@ -253,16 +252,16 @@
     ]
   },
   "cohesion": {
-    "0": 0.1091753774680604,
-    "1": 0.04878048780487805,
-    "2": 0.18716577540106952,
-    "3": 0.11330049261083744,
+    "0": 0.10083256244218317,
+    "1": 0.045454545454545456,
+    "2": 0.1781512605042017,
+    "3": 0.16600790513833993,
     "4": 0.09090909090909091,
-    "5": 0.22794117647058823,
-    "6": 0.18181818181818182,
-    "7": 0.2222222222222222,
+    "5": 0.20833333333333334,
+    "6": 0.2222222222222222,
+    "7": 0.25,
     "8": 0.38095238095238093,
-    "9": 0.47619047619047616,
+    "9": 0.2857142857142857,
     "10": 0.4,
     "11": 0.6666666666666666
   },
@@ -278,13 +277,13 @@
       "degree": 14
     },
     {
-      "id": "src_core_commands_init",
-      "label": "init()",
+      "id": "src_core_commands_add",
+      "label": "add()",
       "degree": 12
     },
     {
-      "id": "src_core_commands_add",
-      "label": "add()",
+      "id": "src_core_commands_init",
+      "label": "init()",
       "degree": 12
     },
     {
@@ -293,13 +292,13 @@
       "degree": 12
     },
     {
-      "id": "package_scripts",
-      "label": "scripts",
+      "id": "src_core_commands_build",
+      "label": "build()",
       "degree": 11
     },
     {
-      "id": "src_core_commands_build",
-      "label": "build()",
+      "id": "package_scripts",
+      "label": "scripts",
       "degree": 11
     },
     {
@@ -308,13 +307,13 @@
       "degree": 9
     },
     {
-      "id": "src_core_frontmatter_parsefrontmatter",
-      "label": "parseFrontmatter()",
+      "id": "src_sdk_seen_computewhatsnewfromstorage",
+      "label": "computeWhatsNewFromStorage()",
       "degree": 9
     },
     {
-      "id": "src_sdk_seen_computewhatsnewfromstorage",
-      "label": "computeWhatsNewFromStorage()",
+      "id": "src_sdk_seen_markwhatsnewseen",
+      "label": "markWhatsNewSeen()",
       "degree": 9
     }
   ],
@@ -328,36 +327,25 @@
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
-      "why": "connects across different repos/directories"
+      "why": "connects across different repos/directories; bridges separate communities"
     },
     {
-      "source": "buildProject()",
-      "target": "readEntries()",
+      "source": "ParseEntryInput",
+      "target": "ChangelogConfig",
       "source_files": [
-        "src/core/build.ts",
-        "src/core/entry.ts"
+        "src/core/entry.ts",
+        "src/core/types.ts"
       ],
       "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "bridges separate communities"
+      "relation": "references",
+      "why": "peripheral node `ParseEntryInput` unexpectedly reaches hub `ChangelogConfig`"
     },
     {
-      "source": "buildProject()",
-      "target": "renderMarkdown()",
-      "source_files": [
-        "src/core/build.ts",
-        "src/core/render-md.ts"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "calls",
-      "why": "bridges separate communities"
-    },
-    {
-      "source": "today()",
-      "target": "localToday()",
+      "source": "build()",
+      "target": "buildProject()",
       "source_files": [
         "src/core/commands.ts",
-        "src/sdk/seen.ts"
+        "src/core/build.ts"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
@@ -365,10 +353,21 @@
     },
     {
       "source": "init()",
-      "target": "renderPage()",
+      "target": "buildProject()",
       "source_files": [
         "src/core/commands.ts",
-        "src/ui/page.ts"
+        "src/core/build.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "add()",
+      "target": "entryFileName()",
+      "source_files": [
+        "src/core/commands.ts",
+        "src/core/entry.ts"
       ],
       "confidence": "EXTRACTED",
       "relation": "calls",
