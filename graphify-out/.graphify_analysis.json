@@ -1,0 +1,382 @@
+{
+  "communities": {
+    "0": [
+      "src_cli",
+      "src_cli_bool",
+      "src_cli_flags",
+      "src_cli_iskind",
+      "src_cli_main",
+      "src_cli_parseargs",
+      "src_cli_printhelp",
+      "src_cli_readpackageversion",
+      "src_cli_str",
+      "src_cli_version",
+      "src_core_build_buildproject",
+      "src_core_build_writebuildoutputs",
+      "src_core_commands",
+      "src_core_commands_add",
+      "src_core_commands_addoptions",
+      "src_core_commands_build",
+      "src_core_commands_init",
+      "src_core_commands_initoptions",
+      "src_core_commands_listentries",
+      "src_core_commands_listoptions",
+      "src_core_commands_quotefrontmatter",
+      "src_core_commands_serve",
+      "src_core_commands_serveoptions",
+      "src_core_commands_today",
+      "src_core_project",
+      "src_core_project_config_file",
+      "src_core_project_configexists",
+      "src_core_project_entrydirof",
+      "src_core_project_findproject",
+      "src_core_project_loadconfig",
+      "src_core_project_outdirof",
+      "src_core_project_writeconfig",
+      "src_core_templates",
+      "src_core_templates_agents_snippet_template",
+      "src_core_templates_entry_template",
+      "src_core_templates_readme_template",
+      "src_core_templates_runbook_template",
+      "src_core_templates_skill_template",
+      "src_core_types_changelogkind",
+      "src_core_types_kind_order",
+      "src_server_server_startserver",
+      "test_server_test"
+    ],
+    "1": [
+      "package",
+      "package_author",
+      "package_author_email",
+      "package_author_name",
+      "package_author_url",
+      "package_bin",
+      "package_bin_changelog",
+      "package_bugs",
+      "package_bugs_url",
+      "package_description",
+      "package_engines",
+      "package_engines_node",
+      "package_exports",
+      "package_exports_package_json",
+      "package_exports_sdk",
+      "package_files",
+      "package_homepage",
+      "package_json_ref_dist",
+      "package_keywords",
+      "package_license",
+      "package_main",
+      "package_name",
+      "package_packagemanager",
+      "package_publishconfig",
+      "package_publishconfig_access",
+      "package_repository",
+      "package_repository_type",
+      "package_repository_url",
+      "package_sdk_default",
+      "package_sdk_import",
+      "package_sdk_types",
+      "package_type",
+      "package_types",
+      "package_version",
+      "ref_changelog",
+      "ref_cli",
+      "ref_frontmatter",
+      "ref_markdown",
+      "ref_release",
+      "ref_release_notes",
+      "ref_whats_new"
+    ],
+    "2": [
+      "src_core_types_changelogaudience",
+      "src_core_types_changelogentry",
+      "src_index",
+      "src_sdk_index",
+      "src_sdk_seen",
+      "src_sdk_seen_computewhatsnew",
+      "src_sdk_seen_computewhatsnewfromstorage",
+      "src_sdk_seen_default_seen_ids_key",
+      "src_sdk_seen_default_seen_key",
+      "src_sdk_seen_entriessince",
+      "src_sdk_seen_localize",
+      "src_sdk_seen_localizedentry",
+      "src_sdk_seen_localtoday",
+      "src_sdk_seen_markseen",
+      "src_sdk_seen_markseentoday",
+      "src_sdk_seen_markwhatsnewseen",
+      "src_sdk_seen_newestfirst",
+      "src_sdk_seen_readseendate",
+      "src_sdk_seen_readseenentryidstate",
+      "src_sdk_seen_resolveseenstorage",
+      "src_sdk_seen_seenentryidstate",
+      "src_sdk_seen_seenstorage",
+      "src_sdk_seen_seenstorage_getitem",
+      "src_sdk_seen_seenstorage_setitem",
+      "src_sdk_seen_seenstorageoptions",
+      "src_sdk_seen_seenstoragesource",
+      "src_sdk_seen_shouldshowwhatsnew",
+      "src_sdk_seen_whatsnewstate",
+      "src_sdk_seen_writeseendate",
+      "test_seen_test",
+      "test_seen_test_getitem",
+      "test_seen_test_makeentry",
+      "test_seen_test_memorystorage",
+      "test_seen_test_setitem"
+    ],
+    "3": [
+      "promises",
+      "src_core_build",
+      "src_core_render_md",
+      "src_core_render_md_badge",
+      "src_core_render_md_kind_label",
+      "src_core_render_md_rendermarkdown",
+      "src_core_types",
+      "src_core_types_audiences",
+      "src_core_types_buildissue",
+      "src_core_types_buildresult",
+      "src_core_types_changelogdocument",
+      "src_core_types_changelogproject",
+      "src_server_server",
+      "src_server_server_mime",
+      "src_server_server_serveoptions",
+      "src_ui_page",
+      "src_ui_page_embedjson",
+      "src_ui_page_escapehtml",
+      "src_ui_page_renderpage",
+      "test_build_test",
+      "test_build_test_makeroot",
+      "test_build_test_pageelement",
+      "test_build_test_pageelement_addeventlistener",
+      "test_build_test_pageelement_appendchild",
+      "test_build_test_pageelement_getattribute",
+      "test_build_test_pageelement_removeattribute",
+      "test_build_test_pageelement_setattribute",
+      "test_build_test_runstandalonepage",
+      "test_build_test_standalonedocument"
+    ],
+    "4": [
+      "ref_es2022",
+      "ref_node_modules",
+      "ref_src_ts",
+      "ref_test",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_declaration",
+      "tsconfig_compileroptions_esmoduleinterop",
+      "tsconfig_compileroptions_forceconsistentcasinginfilenames",
+      "tsconfig_compileroptions_lib",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_outdir",
+      "tsconfig_compileroptions_resolvejsonmodule",
+      "tsconfig_compileroptions_rootdir",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_sourcemap",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_compileroptions_target",
+      "tsconfig_exclude",
+      "tsconfig_include",
+      "tsconfig_json_ref_dist"
+    ],
+    "5": [
+      "src_core_entry",
+      "src_core_entry_entry_pattern",
+      "src_core_entry_entryfilename",
+      "src_core_entry_isknownaudience",
+      "src_core_entry_isknownkind",
+      "src_core_entry_parsebodylanguagesections",
+      "src_core_entry_parseentry",
+      "src_core_entry_parseentryinput",
+      "src_core_entry_readentries",
+      "src_core_entry_slugify",
+      "src_core_entry_striptitle",
+      "src_core_project_default_config",
+      "src_core_types_changelogconfig",
+      "test_entry_test",
+      "test_entry_test_config",
+      "test_i18n_test",
+      "test_i18n_test_config"
+    ],
+    "6": [
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_check",
+      "package_scripts_clean",
+      "package_scripts_dev",
+      "package_scripts_prepare",
+      "package_scripts_prepublish",
+      "package_scripts_prepublishonly",
+      "package_scripts_test",
+      "package_scripts_test_watch",
+      "package_scripts_typecheck"
+    ],
+    "7": [
+      "package_devdependencies",
+      "package_devdependencies_rimraf",
+      "package_devdependencies_tsx",
+      "package_devdependencies_types_node",
+      "package_devdependencies_typescript",
+      "rimraf",
+      "tsx",
+      "types_node",
+      "typescript"
+    ],
+    "8": [
+      "scripts_publish_registry",
+      "scripts_publish_registry_artifact_registry",
+      "scripts_publish_registry_assertsameartifact",
+      "scripts_publish_registry_execfileasync",
+      "scripts_publish_registry_manifest",
+      "scripts_publish_registry_npm",
+      "scripts_publish_registry_readpublishedintegrity"
+    ],
+    "9": [
+      "src_core_frontmatter",
+      "src_core_frontmatter_coerce",
+      "src_core_frontmatter_frontmatter",
+      "src_core_frontmatter_parsefrontmatter",
+      "src_core_frontmatter_serializefrontmatter",
+      "src_core_frontmatter_splitlist",
+      "test_frontmatter_test"
+    ],
+    "10": [
+      "examples_react_whatsnewmodal",
+      "examples_react_whatsnewmodal_changelogdocument",
+      "examples_react_whatsnewmodal_kind_color",
+      "examples_react_whatsnewmodal_kind_label",
+      "examples_react_whatsnewmodal_whatsnewmodal"
+    ],
+    "11": [
+      "test_cli_test",
+      "test_cli_test_execfileasync",
+      "test_cli_test_root"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1091753774680604,
+    "1": 0.04878048780487805,
+    "2": 0.18716577540106952,
+    "3": 0.11330049261083744,
+    "4": 0.09090909090909091,
+    "5": 0.22794117647058823,
+    "6": 0.18181818181818182,
+    "7": 0.2222222222222222,
+    "8": 0.38095238095238093,
+    "9": 0.47619047619047616,
+    "10": 0.4,
+    "11": 0.6666666666666666
+  },
+  "gods": [
+    {
+      "id": "src_core_entry_parseentry",
+      "label": "parseEntry()",
+      "degree": 14
+    },
+    {
+      "id": "tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 14
+    },
+    {
+      "id": "src_core_commands_init",
+      "label": "init()",
+      "degree": 12
+    },
+    {
+      "id": "src_core_commands_add",
+      "label": "add()",
+      "degree": 12
+    },
+    {
+      "id": "src_core_project_findproject",
+      "label": "findProject()",
+      "degree": 12
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 11
+    },
+    {
+      "id": "src_core_commands_build",
+      "label": "build()",
+      "degree": 11
+    },
+    {
+      "id": "src_cli_main",
+      "label": "main()",
+      "degree": 9
+    },
+    {
+      "id": "src_core_frontmatter_parsefrontmatter",
+      "label": "parseFrontmatter()",
+      "degree": 9
+    },
+    {
+      "id": "src_sdk_seen_computewhatsnewfromstorage",
+      "label": "computeWhatsNewFromStorage()",
+      "degree": 9
+    }
+  ],
+  "surprises": [
+    {
+      "source": "runStandalonePage()",
+      "target": "renderPage()",
+      "source_files": [
+        "test/build.test.ts",
+        "src/ui/page.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "buildProject()",
+      "target": "readEntries()",
+      "source_files": [
+        "src/core/build.ts",
+        "src/core/entry.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "buildProject()",
+      "target": "renderMarkdown()",
+      "source_files": [
+        "src/core/build.ts",
+        "src/core/render-md.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "today()",
+      "target": "localToday()",
+      "source_files": [
+        "src/core/commands.ts",
+        "src/sdk/seen.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "init()",
+      "target": "renderPage()",
+      "source_files": [
+        "src/core/commands.ts",
+        "src/ui/page.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
