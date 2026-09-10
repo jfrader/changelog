@@ -18,3 +18,4 @@ npm-debug.log*
 .vscode/
 node_modules/
 
+graphify-out/
