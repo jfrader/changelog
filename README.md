@@ -1,5 +1,11 @@
 # @jfrader/changelog
 
+[![npm version](https://img.shields.io/npm/v/@jfrader/changelog?style=flat)](https://www.npmjs.com/package/@jfrader/changelog)
+[![npm downloads](https://img.shields.io/npm/dm/@jfrader/changelog?style=flat)](https://www.npmjs.com/package/@jfrader/changelog)
+[![ci](https://img.shields.io/github/actions/workflow/status/jfrader/changelog/ci.yml?branch=main&style=flat&label=ci)](https://github.com/jfrader/changelog/actions)
+[![license](https://img.shields.io/github/license/jfrader/changelog?style=flat)](./LICENSE)
+[![node](https://img.shields.io/node/v/@jfrader/changelog?style=flat)](https://www.npmjs.com/package/@jfrader/changelog)
+
 A zero-dependency changelog system for any project. It combines:
 
 1. **Markdown entries** — one file per end-user-visible change, reviewed in git.
