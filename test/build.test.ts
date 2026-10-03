@@ -245,14 +245,26 @@ test('renderPage embeds JSON safely', async () => {
   assert.ok(html.includes('<\\/script>'));
 });
 
-test('standalone page keeps the mobile toolbar compact and aligned', () => {
+test('standalone page keeps language and theme controls in the header corner', () => {
   const html = renderPage(standaloneDocument({}));
 
+  const hero = html.match(/<header class="hero">([\s\S]*?)<\/header>/u)?.[1];
+  const toolbar = html.match(/<nav class="toolbar">([\s\S]*?)<\/nav>/u)?.[1];
+  assert.ok(hero?.includes('id="langs"'), 'language controls live in the header');
+  assert.ok(hero?.includes('id="theme-toggle"'), 'theme toggle lives in the header');
+  assert.ok(toolbar, 'toolbar is present');
+  assert.ok(!toolbar.includes('id="langs"'), 'toolbar keeps only filters and search');
+  assert.ok(!toolbar.includes('theme-toggle'), 'toolbar keeps only filters and search');
+
+  assert.match(html, /\.hero-top \{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; \}/u);
+  assert.match(html, /\.hero-controls \{ display: flex; align-items: center; gap: 8px; flex: none; \}/u);
+  assert.match(html, /\.eyebrow \{\s+display: inline-flex; align-items: center; gap: 8px;\s+min-width: 0; overflow-wrap: anywhere;/u);
   assert.match(html, /\.search \{\s+margin-left: auto; flex: 1 1 180px; min-width: 0; max-width: 260px; height: 36px;/u);
-  assert.match(html, /@media \(max-width: 620px\) \{[\s\S]*?\.toolbar-inner \{\s+display: grid; grid-template-columns: minmax\(0, 1fr\) auto;/u);
-  assert.match(html, /\.search \{\s+grid-column: 1 \/ -1; grid-row: 2; width: 100%; max-width: none; height: 40px;\s+margin-left: 0; flex: none;/u);
-  assert.match(html, /\.langs \{ display: flex; flex-wrap: wrap; min-width: 0; gap: 4px; \}/u);
-  assert.match(html, /\.theme-toggle \{ grid-column: 2; grid-row: 3; justify-self: end; align-self: center; \}/u);
+  assert.match(html, /@media \(max-width: 620px\) \{[\s\S]*?\.toolbar-inner \{\s+display: grid; grid-template-columns: minmax\(0, 1fr\); gap: 10px; align-items: center;/u);
+  assert.match(html, /\.filters \{ grid-row: 1; \}/u);
+  assert.match(html, /\.search \{\s+grid-row: 2; width: 100%; max-width: none; height: 40px;\s+margin-left: 0; flex: none;/u);
+  assert.match(html, /\.lang, \.theme-toggle \{ height: 40px; \}/u);
+  assert.ok(!html.includes('grid-row: 3'), 'controls no longer wrap to a third toolbar row');
 });
 
 test('standalone page sanitizes markdown link destinations', () => {
