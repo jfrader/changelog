@@ -65,10 +65,11 @@ a { color: var(--accent); }
 .hero-controls { display: flex; align-items: center; gap: 8px; flex: none; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
+  min-width: 0; overflow-wrap: anywhere;
   font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
   color: var(--accent);
 }
-.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.eyebrow .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 h1 { margin: 10px 0 6px; font-size: 30px; line-height: 1.15; letter-spacing: -.02em; }
 .tagline { margin: 0; color: var(--text-soft); font-size: 15px; }
 .summary {

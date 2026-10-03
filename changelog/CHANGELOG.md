@@ -2,7 +2,7 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 03 Oct 2026 04:38:40 GMT from 9 entries._
+_Generated Sat, 03 Oct 2026 04:51:51 GMT from 9 entries._
 
 ## 2026-10-03
 
@@ -10,7 +10,7 @@ _Generated Sat, 03 Oct 2026 04:38:40 GMT from 9 entries._
 
 _Fix · `ui` `header` `page`_
 
-The full changelog page keeps the language and theme controls in the top-right corner of the header. The sticky toolbar stays on one row with only the filters and the search box.
+The full changelog page keeps the language and theme controls in the top-right corner of the header. The sticky toolbar now holds only the filters and the search box.
 
 ## 2026-08-20
 

@@ -258,6 +258,7 @@ test('standalone page keeps language and theme controls in the header corner', (
 
   assert.match(html, /\.hero-top \{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; \}/u);
   assert.match(html, /\.hero-controls \{ display: flex; align-items: center; gap: 8px; flex: none; \}/u);
+  assert.match(html, /\.eyebrow \{\s+display: inline-flex; align-items: center; gap: 8px;\s+min-width: 0; overflow-wrap: anywhere;/u);
   assert.match(html, /\.search \{\s+margin-left: auto; flex: 1 1 180px; min-width: 0; max-width: 260px; height: 36px;/u);
   assert.match(html, /@media \(max-width: 620px\) \{[\s\S]*?\.toolbar-inner \{\s+display: grid; grid-template-columns: minmax\(0, 1fr\); gap: 10px; align-items: center;/u);
   assert.match(html, /\.filters \{ grid-row: 1; \}/u);
