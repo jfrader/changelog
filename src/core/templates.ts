@@ -191,6 +191,9 @@ static content:
 - **In-app**: fetch \`changelog.json\` from the app and render a "What's new"
   panel with the shared page's design tokens.
 
+Set \`homeUrl\` in \`config.json\` (for example \`"/"\`) so the published page
+shows a link back to the product next to the language and theme controls.
+
 Suggested deploy gate: build the changelog in CI on every release and fail the
 release if any published entry references an unreleased change (that is a
 policy check, not something the tool decides for you).

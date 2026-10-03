@@ -20,6 +20,7 @@ export async function buildProject(project: ChangelogProject): Promise<BuildResu
     productName: project.config.productName,
     tagline: project.config.tagline,
     accent: project.config.accent,
+    ...(project.config.homeUrl ? { homeUrl: project.config.homeUrl } : {}),
     languages: project.config.languages,
     defaultLanguage: project.config.defaultLanguage,
     generatedAt: new Date().toISOString(),
