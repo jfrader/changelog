@@ -285,7 +285,7 @@ test('standalone page links back to the product only when homeUrl is safe', () =
   linked.homeUrl = 'https://example.test/home';
   assert.match(renderPage(linked), /href="https:\/\/example\.test\/home"/u);
 
-  for (const unsafe of ['javascript:alert(1)', 'data:text/html,boom', '//evil.test/', 'not a url']) {
+  for (const unsafe of ['javascript:alert(1)', 'data:text/html,boom', '//evil.test/', '/\\evil.test/', '/\\\\evil.test/', 'not a url']) {
     linked.homeUrl = unsafe;
     assert.ok(!renderPage(linked).includes('id="home-link"'), `${unsafe} must not render a link`);
   }

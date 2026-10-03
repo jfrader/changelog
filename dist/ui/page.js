@@ -533,9 +533,13 @@ function safeHomeUrl(raw) {
     const value = raw?.trim();
     if (!value || /[\u0000-\u001f\u007f]/.test(value))
         return null;
-    if (value.startsWith('/') && !value.startsWith('//'))
-        return value;
     try {
+        if (value.startsWith('/') && !value.startsWith('//')) {
+            // Browsers treat backslashes as path separators, so `/\evil.test`
+            // resolves off-origin; root-relative values must stay on the base.
+            const base = new URL('https://changelog.invalid/');
+            return new URL(value, base).origin === base.origin ? value : null;
+        }
         const url = new URL(value);
         return url.protocol === 'http:' || url.protocol === 'https:' ? value : null;
     }
