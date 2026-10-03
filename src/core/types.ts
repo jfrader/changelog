@@ -52,6 +52,8 @@ export interface ChangelogConfig {
   tagline: string;
   /** Accent color for the end-user page (hex). */
   accent: string;
+  /** Optional URL back to the product; the page links to it from the header. */
+  homeUrl?: string;
   /** Language codes entries may provide, e.g. ["en", "es"]. */
   languages: string[];
   /** Language used for unmarked/legacy content, the human doc and fallbacks. */
@@ -76,6 +78,8 @@ export interface ChangelogDocument {
   productName: string;
   tagline: string;
   accent: string;
+  /** Optional URL back to the product; the page links to it from the header. */
+  homeUrl?: string;
   /** Language codes the entries may provide. */
   languages: string[];
   /** Language used as the default / fallback. */

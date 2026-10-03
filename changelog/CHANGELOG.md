@@ -2,9 +2,15 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 03 Oct 2026 12:07:18 GMT from 9 entries._
+_Generated Sat, 03 Oct 2026 14:57:38 GMT from 10 entries._
 
 ## 2026-10-03
+
+### The page links back to your product
+
+_New feature · 1.3.0 · `ui` `page`_
+
+Set `homeUrl` in `changelog/config.json` and the full page shows a back link to your product, next to the language and theme controls.
 
 ### Language and theme controls in the header corner
 

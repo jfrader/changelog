@@ -100,6 +100,8 @@ It includes:
 - a "What's new" hero with per-kind summary chips;
 - filter chips (All / new features / improvements / fixes / breaking changes);
 - search, a "New" pulse on the latest feature, and a dark/light theme toggle;
+- an optional link back to the product, set with `homeUrl` in
+  `changelog/config.json` (for example `"/"` or a full URL);
 - a safe mini-Markdown renderer for entry bodies.
 
 Use `/changelog` as the public URL. On static SPA hosts, add an exact internal

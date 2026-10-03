@@ -48,7 +48,7 @@ class PageElement {
 function runStandalonePage(
   document: ChangelogDocument,
   browserLanguages: string[] = ['en'],
-): { content: string; pageTitle: string } {
+): { content: string; pageTitle: string; homeLabel?: string } {
   const page = renderPage(document);
   const dataSource = page.match(
     /<script type="application\/json" id="changelog-data">([\s\S]*?)<\/script>/u,
@@ -59,7 +59,7 @@ function runStandalonePage(
   assert.ok(runtime);
 
   const elements = new Map<string, PageElement>();
-  for (const id of [
+  const elementIds = [
     'changelog-data',
     'content',
     'filters',
@@ -70,7 +70,10 @@ function runStandalonePage(
     'langs',
     'summary',
     'theme-toggle',
-  ]) {
+  ];
+  // The back-link label only exists when the page rendered a home link.
+  if (page.includes('id="home-label"')) elementIds.push('home-label');
+  for (const id of elementIds) {
     elements.set(id, new PageElement());
   }
   elements.get('changelog-data')!.textContent = dataSource;
@@ -95,6 +98,7 @@ function runStandalonePage(
   return {
     content: elements.get('content')!.innerHTML,
     pageTitle: elements.get('page-title')!.textContent,
+    homeLabel: elements.get('home-label')?.textContent,
   };
 }
 
@@ -265,6 +269,52 @@ test('standalone page keeps language and theme controls in the header corner', (
   assert.match(html, /\.search \{\s+grid-row: 2; width: 100%; max-width: none; height: 40px;\s+margin-left: 0; flex: none;/u);
   assert.match(html, /\.lang, \.theme-toggle \{ height: 40px; \}/u);
   assert.ok(!html.includes('grid-row: 3'), 'controls no longer wrap to a third toolbar row');
+});
+
+test('standalone page links back to the product only when homeUrl is safe', () => {
+  const plain = renderPage(standaloneDocument({}));
+  assert.ok(!plain.includes('id="home-link"'), 'no back link without homeUrl');
+
+  const linked = standaloneDocument({});
+  linked.homeUrl = '/diario';
+  const html = renderPage(linked);
+  assert.match(html, /<a class="back" id="home-link" href="\/diario">/u);
+  assert.match(html, /id="home-label">Back</u);
+  assert.match(html, /\.back \{\s+display: inline-flex; align-items: center; gap: 6px;/u);
+
+  linked.homeUrl = 'https://example.test/home';
+  assert.match(renderPage(linked), /href="https:\/\/example\.test\/home"/u);
+
+  for (const unsafe of ['javascript:alert(1)', 'data:text/html,boom', '//evil.test/', '/\\evil.test/', '/\\\\evil.test/', 'not a url']) {
+    linked.homeUrl = unsafe;
+    assert.ok(!renderPage(linked).includes('id="home-link"'), `${unsafe} must not render a link`);
+  }
+});
+
+test('back link label follows the page language', () => {
+  const document = standaloneDocument({});
+  document.languages = ['en', 'es'];
+  document.homeUrl = '/';
+
+  assert.equal(runStandalonePage(document, ['en-US']).homeLabel, 'Back');
+  assert.equal(runStandalonePage(document, ['es-AR']).homeLabel, 'Volver');
+});
+
+test('build carries homeUrl into the feed and the page', async () => {
+  const root = await makeRoot();
+  await init({ root, product: 'x', productName: 'X' });
+  const project = await findProject(root);
+  const configPath = path.join(project!.changelogDir, 'config.json');
+  const config = JSON.parse(await fs.readFile(configPath, 'utf8'));
+  config.homeUrl = '/';
+  await fs.writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
+
+  await build({ root });
+
+  const json = JSON.parse(await fs.readFile(path.join(project!.changelogDir, 'changelog.json'), 'utf8'));
+  assert.equal(json.homeUrl, '/');
+  const html = await fs.readFile(path.join(project!.changelogDir, 'index.html'), 'utf8');
+  assert.match(html, /id="home-link" href="\/"/u);
 });
 
 test('standalone page sanitizes markdown link destinations', () => {

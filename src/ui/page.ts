@@ -72,7 +72,13 @@ a { color: var(--accent); }
 }
 .hero-inner { max-width: 860px; margin: 0 auto; }
 .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.hero-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
 .hero-controls { display: flex; align-items: center; gap: 8px; flex: none; }
+.back {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-soft); font-size: 13px; font-weight: 600; text-decoration: none;
+}
+.back:hover { color: var(--accent); }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   min-width: 0; overflow-wrap: anywhere;
@@ -246,6 +252,7 @@ const JS = `
 
   // ---- UI strings per language ----
   const UI = {
+    back: { en: 'Back', es: 'Volver' },
     eyebrow: { en: "What's new", es: 'Novedades' },
     title: { en: 'Changelog', es: 'Novedades' },
     all: { en: 'All', es: 'Todos' },
@@ -402,6 +409,8 @@ const JS = `
     document.documentElement.lang = state.lang;
     document.getElementById('hero-eyebrow').textContent = data.productName + ' · ' + ui('eyebrow');
     document.getElementById('page-title').textContent = ui('title');
+    const homeLabel = document.getElementById('home-label');
+    if (homeLabel) homeLabel.textContent = ui('back');
     document.getElementById('search').placeholder = ui('search');
     const footer = document.getElementById('page-footer');
     footer.textContent =
@@ -528,10 +537,35 @@ const JS = `
 })();
 `;
 
+/**
+ * Destinations safe for the back link: a root-relative path or an absolute
+ * http(s) URL. Anything else (javascript:, data:, protocol-relative) is dropped.
+ */
+function safeHomeUrl(raw: string | undefined): string | null {
+  const value = raw?.trim();
+  if (!value || /[\u0000-\u001f\u007f]/.test(value)) return null;
+  try {
+    if (value.startsWith('/') && !value.startsWith('//')) {
+      // Browsers treat backslashes as path separators, so `/\evil.test`
+      // resolves off-origin; root-relative values must stay on the base.
+      const base = new URL('https://changelog.invalid/');
+      return new URL(value, base).origin === base.origin ? value : null;
+    }
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export function renderPage(document: ChangelogDocument): string {
   const accent = /^#[0-9a-fA-F]{3,8}$/.test(document.accent) ? document.accent : '#22c55e';
   const css = CSS.replace(/ACCENT/g, accent);
   const title = `${document.productName} — Changelog`;
+  const homeUrl = safeHomeUrl(document.homeUrl);
+  const backLink = homeUrl
+    ? `<a class="back" id="home-link" href="${escapeHtml(homeUrl)}"><span aria-hidden="true">←</span><span id="home-label">Back</span></a>`
+    : '';
 
   return `<!doctype html>
 <html lang="en">
@@ -546,7 +580,10 @@ export function renderPage(document: ChangelogDocument): string {
 <header class="hero">
   <div class="hero-inner">
     <div class="hero-top">
-      <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
+      <div class="hero-brand">
+        ${backLink}
+        <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
+      </div>
       <div class="hero-controls">
         <div class="langs" id="langs" aria-label="Language"></div>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
