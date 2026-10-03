@@ -9,8 +9,38 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-08-21T04:44:50.647Z",
+  "generatedAt": "2026-10-03T04:38:40.529Z",
   "entries": [
+    {
+      "id": "2026-10-03--idioma-y-tema-en-la-esquina-del-header",
+      "kind": "fix",
+      "title": "Language and theme controls in the header corner",
+      "body": "The full changelog page keeps the language and theme controls in the top-right corner of the header. The sticky toolbar stays on one row with only the filters and the search box.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "en": "Language and theme controls in the header corner",
+        "es": "Idioma y tema en la esquina del header"
+      },
+      "bodyByLang": {
+        "en": "The full changelog page keeps the language and theme controls in the top-right corner of the header. The sticky toolbar stays on one row with only the filters and the search box.",
+        "es": "La página completa de novedades mantiene los controles de idioma y tema en la esquina superior derecha del header. La barra fija queda en una sola fila, solo con los filtros y la búsqueda."
+      },
+      "date": "2026-10-03",
+      "product": "changelog",
+      "productName": "changelog",
+      "tags": [
+        "ui",
+        "header",
+        "page"
+      ],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-10-03--idioma-y-tema-en-la-esquina-del-header.md",
+      "relPath": "entries/2026-10-03--idioma-y-tema-en-la-esquina-del-header.md"
+    },
     {
       "id": "2026-08-20--changelog-pages-fit-mobile-screens",
       "kind": "fix",

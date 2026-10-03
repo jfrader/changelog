@@ -61,6 +61,8 @@ a { color: var(--accent); }
     var(--bg);
 }
 .hero-inner { max-width: 860px; margin: 0 auto; }
+.hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.hero-controls { display: flex; align-items: center; gap: 8px; flex: none; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
@@ -210,16 +212,15 @@ footer { max-width: 860px; margin: 0 auto; padding: 0 20px 40px; color: var(--te
   .hero { padding: 32px 16px 22px; }
   .toolbar { padding: 10px 16px; }
   .toolbar-inner {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-items: center;
   }
-  .filters { grid-column: 1 / -1; grid-row: 1; }
+  .filters { grid-row: 1; }
   .search {
-    grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; height: 40px;
+    grid-row: 2; width: 100%; max-width: none; height: 40px;
     margin-left: 0; flex: none;
   }
-  .langs { grid-column: 1; grid-row: 3; }
   .lang, .theme-toggle { height: 40px; }
-  .theme-toggle { grid-column: 2; grid-row: 3; justify-self: end; align-self: center; }
+  .theme-toggle { width: 40px; }
 }
 `;
 const JS = `
@@ -530,7 +531,13 @@ export function renderPage(document) {
 <body>
 <header class="hero">
   <div class="hero-inner">
-    <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
+    <div class="hero-top">
+      <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span>${escapeHtml(document.productName)} · What's new</span>
+      <div class="hero-controls">
+        <div class="langs" id="langs" aria-label="Language"></div>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </div>
     <h1 id="page-title">Changelog</h1>
     <p class="tagline">${escapeHtml(document.tagline)}</p>
     <div class="summary" id="summary"></div>
@@ -543,8 +550,6 @@ export function renderPage(document) {
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="search" type="search" placeholder="Search entries…" aria-label="Search entries" />
     </label>
-    <div class="langs" id="langs" aria-label="Language"></div>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
   </div>
 </nav>
 <main class="content" id="content"></main>
