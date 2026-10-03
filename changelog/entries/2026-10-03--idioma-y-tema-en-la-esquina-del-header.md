@@ -6,6 +6,7 @@ title.es: "Idioma y tema en la esquina del header"
 tags: [ui, header, page]
 audience: all
 published: true
+version: 1.2.1
 ---
 
 ## en

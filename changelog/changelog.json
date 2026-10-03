@@ -9,7 +9,7 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-10-03T04:51:51.576Z",
+  "generatedAt": "2026-10-03T12:07:18.531Z",
   "entries": [
     {
       "id": "2026-10-03--idioma-y-tema-en-la-esquina-del-header",
@@ -31,6 +31,7 @@
       "date": "2026-10-03",
       "product": "changelog",
       "productName": "changelog",
+      "version": "1.2.1",
       "tags": [
         "ui",
         "header",
