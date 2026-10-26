@@ -12,4 +12,4 @@ export { renderMarkdown, } from './core/render-md.js';
 export { renderPage, escapeHtml, } from './ui/page.js';
 export { startServer } from './server/server.js';
 export { computeWhatsNew, computeWhatsNewFromStorage, entriesSince, localize, localToday, markSeen, markWhatsNewSeen, markSeenToday, readSeenDate, shouldShowWhatsNew, writeSeenDate, DEFAULT_SEEN_KEY, DEFAULT_SEEN_IDS_KEY, type LocalizedEntry, type SeenStorage, type SeenStorageSource, type SeenStorageOptions, type WhatsNewState, } from './sdk/seen.js';
-export { KIND_ORDER, AUDIENCES, type ChangelogEntry, type ChangelogConfig, type ChangelogProject, type ChangelogDocument, type BuildResult, type ChangelogKind, type ChangelogAudience, } from './core/types.js';
+export { KIND_ORDER, AUDIENCES, DEFAULT_AUDIENCES, type ChangelogEntry, type ChangelogConfig, type ChangelogProject, type ChangelogDocument, type BuildResult, type ChangelogKind, type ChangelogAudience, } from './core/types.js';

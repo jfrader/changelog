@@ -106,7 +106,7 @@ Commands:
        --date YYYY-MM-DD       Default: today
        --version x.y.z         Optional
        --tags a,b,c            Optional
-       --audience <a>          all|player|manager|guest|admin (default: all)
+       --audience <a>          Configured audience (default: all)
        --draft                 Create as unpublished
        --root <dir>
   list                 List entries (--all includes drafts).

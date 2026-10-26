@@ -4,7 +4,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { buildProject, writeBuildOutputs } from './build.js';
-import { entryFileName, slugify, ENTRY_PATTERN } from './entry.js';
+import { entryFileName, slugify, resolveAudience, ENTRY_PATTERN } from './entry.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { findProject, loadConfig, writeConfig, DEFAULT_CONFIG, CONFIG_FILE, entryDirOf, outDirOf } from './project.js';
 import { localToday } from '../sdk/seen.js';
@@ -104,7 +104,9 @@ export async function add(options) {
         throw new Error(`Entry already exists: ${target}`);
     }
     const tags = options.tags?.filter(Boolean) ?? [];
-    const audience = options.audience ?? 'all';
+    const { audience, warning } = resolveAudience(options.audience, config.audiences);
+    if (warning)
+        console.warn(`warn: ${warning}`);
     const version = options.version ?? '';
     const kind = options.kind;
     // Multi-language scaffold when more than one language is provided.
@@ -123,7 +125,7 @@ export async function add(options) {
     else {
         headLines.push(`title: ${quoteFrontmatter(titleByLang[defaultLanguage])}`);
     }
-    headLines.push(`tags: [${tags.join(', ')}]`, `audience: ${audience}`, `published: ${options.draft ? 'false' : 'true'}`, ...(version ? [`version: ${version}`] : []), '---', '');
+    headLines.push(`tags: [${tags.join(', ')}]`, `audience: ${quoteFrontmatter(audience)}`, `published: ${options.draft ? 'false' : 'true'}`, ...(version ? [`version: ${version}`] : []), '---', '');
     const head = headLines.join('\n');
     const placeholder = ENTRY_TEMPLATE.split('\n\n').slice(2).join('\n\n').trim();
     let content;

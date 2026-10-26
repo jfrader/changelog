@@ -1,7 +1,11 @@
 import { type ChangelogConfig, type ChangelogEntry, type ChangelogKind, type ChangelogAudience } from './types.js';
 export declare const ENTRY_PATTERN: RegExp;
 export declare function isKnownKind(value: unknown): value is ChangelogKind;
-export declare function isKnownAudience(value: unknown): value is ChangelogAudience;
+export declare function isKnownAudience(value: unknown, audiences?: readonly string[]): value is ChangelogAudience;
+export declare function resolveAudience(value: unknown, audiences?: readonly string[]): {
+    audience: ChangelogAudience;
+    warning?: string;
+};
 export declare function slugify(input: string): string;
 export declare function entryFileName(date: string, slug: string): string;
 export declare function stripTitle(body: string): {

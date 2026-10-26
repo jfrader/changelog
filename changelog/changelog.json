@@ -9,8 +9,35 @@
     "es"
   ],
   "defaultLanguage": "en",
-  "generatedAt": "2026-10-03T14:57:38.316Z",
+  "generatedAt": "2026-10-26T13:02:22.188Z",
   "entries": [
+    {
+      "id": "2026-10-26--use-your-product-s-audience-roles",
+      "kind": "feature",
+      "title": "Use your product's audience roles",
+      "body": "Set audiences in config.json to tag changelog entries with your own roles, such as trainer and client. Existing audience defaults still work when no list is configured.",
+      "languages": [
+        "en",
+        "es"
+      ],
+      "titleByLang": {
+        "es": "Usa los roles de tu producto",
+        "en": "Use your product's audience roles"
+      },
+      "bodyByLang": {
+        "es": "Configura audiences en config.json para etiquetar las novedades con tus propios roles, como trainer y client. Sin una lista configurada, se mantienen los roles predeterminados.",
+        "en": "Set audiences in config.json to tag changelog entries with your own roles, such as trainer and client. Existing audience defaults still work when no list is configured."
+      },
+      "date": "2026-10-26",
+      "product": "changelog",
+      "productName": "changelog",
+      "version": "1.4.0",
+      "tags": [],
+      "audience": "all",
+      "published": true,
+      "fileName": "2026-10-26--use-your-product-s-audience-roles.md",
+      "relPath": "entries/2026-10-26--use-your-product-s-audience-roles.md"
+    },
     {
       "id": "2026-10-03--the-page-links-back-to-your-product",
       "kind": "feature",

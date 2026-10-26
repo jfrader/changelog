@@ -66,6 +66,7 @@ export {
 export {
   KIND_ORDER,
   AUDIENCES,
+  DEFAULT_AUDIENCES,
   type ChangelogEntry,
   type ChangelogConfig,
   type ChangelogProject,
