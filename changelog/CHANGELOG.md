@@ -2,7 +2,15 @@
 
 > What is new in the changelog tool
 
-_Generated Sat, 03 Oct 2026 14:57:38 GMT from 10 entries._
+_Generated Mon, 26 Oct 2026 13:02:22 GMT from 11 entries._
+
+## 2026-10-26
+
+### Use your product's audience roles
+
+_New feature · 1.4.0_
+
+Set audiences in config.json to tag changelog entries with your own roles, such as trainer and client. Existing audience defaults still work when no list is configured.
 
 ## 2026-10-03
 

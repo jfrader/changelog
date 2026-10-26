@@ -204,6 +204,26 @@ test('full init → add → build → serve-less flow', async () => {
   assert.match(html, /#22c55e/);
 });
 
+test('build preserves a handwritten audience from the project config in the emitted document', async (t) => {
+  const root = await makeRoot();
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const changelogDir = await init({ root, product: 'training', productName: 'Training' });
+  const configPath = path.join(changelogDir, 'config.json');
+  const config = JSON.parse(await fs.readFile(configPath, 'utf8'));
+  config.audiences = ['all', 'trainer', 'client'];
+  await fs.writeFile(configPath, JSON.stringify(config));
+  await fs.writeFile(path.join(changelogDir, 'entries/2026-08-07--training.md'),
+    '---\nkind: feature\ndate: 2026-08-07\ntitle: Training updates\naudience: trainer\n---\nNew training plans.\n');
+
+  const result = await build({ root });
+
+  assert.deepEqual(result.warnings, []);
+  assert.deepEqual(result.errors, []);
+  const document = JSON.parse(await fs.readFile(path.join(changelogDir, 'changelog.json'), 'utf8'));
+  assert.equal(document.entries.length, 1);
+  assert.equal(document.entries[0].audience, 'trainer');
+});
+
 test('build reports issues and skips invalid entries', async () => {
   const root = await makeRoot();
   await init({ root, product: 'x', productName: 'X' });

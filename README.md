@@ -81,6 +81,24 @@ One to three short, literal sentences for end users.
 Required: `kind`, `date` and a title. Invalid entries are reported and skipped
 by the build. Drafts (`published: false`) never reach the page.
 
+### Audiences
+
+Set `audiences` in `changelog/config.json` to use your product's roles:
+
+```json
+{
+  "audiences": ["all", "trainer", "client"]
+}
+```
+
+Then use `audience: trainer` in an entry or `changelog add --audience trainer`.
+Without `audiences`, the defaults remain `all`, `player`, `manager`, `guest`,
+and `admin`. `all` is always accepted, even when omitted from the configured
+list, and is the default for new entries. Unknown values produce a warning
+naming the configured list and fall back to `all`, both when parsing entries
+and when scaffolding them with `add`. The built JSON preserves accepted
+audience values unchanged.
+
 ## Commands
 
 | Command | Purpose |

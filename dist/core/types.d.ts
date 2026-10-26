@@ -3,8 +3,9 @@
  */
 export declare const KIND_ORDER: readonly ["feature", "improvement", "fix", "breaking", "chore"];
 export type ChangelogKind = (typeof KIND_ORDER)[number];
+export declare const DEFAULT_AUDIENCES: readonly ["all", "player", "manager", "guest", "admin"];
 export declare const AUDIENCES: readonly ["all", "player", "manager", "guest", "admin"];
-export type ChangelogAudience = (typeof AUDIENCES)[number];
+export type ChangelogAudience = (typeof AUDIENCES)[number] | (string & {});
 export interface ChangelogEntry {
     /** Stable id derived from the file name, e.g. "2026-08-07--match-replays". */
     id: string;
@@ -40,6 +41,7 @@ export interface ChangelogEntry {
     relPath: string;
 }
 export interface ChangelogConfig {
+    audiences?: string[];
     /** Product slug used in JSON / URLs, e.g. "mifulbo". */
     product: string;
     /** Human product name, e.g. "MiFulbo". */

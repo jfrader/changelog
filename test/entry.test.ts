@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseEntry, slugify, entryFileName, ENTRY_PATTERN, isKnownKind } from '../src/core/entry.ts';
+import { parseEntry, slugify, entryFileName, ENTRY_PATTERN, isKnownKind, isKnownAudience } from '../src/core/entry.ts';
 import { DEFAULT_CONFIG } from '../src/core/project.ts';
+import { AUDIENCES, DEFAULT_AUDIENCES } from '../src/core/types.ts';
 
 const CONFIG = { ...DEFAULT_CONFIG, product: 'mifulbo', productName: 'MiFulbo' };
 
@@ -87,6 +88,40 @@ Body
   const { entry, issues } = parseEntry({ fileName: '2026-08-04--x.md', source, config: CONFIG });
   assert.equal(entry?.audience, 'all');
   assert.ok(issues.some((i) => i.level === 'warn' && i.message.includes('audience')));
+  assert.match(issues[0].message, /expected one of all, player, manager, guest, admin/);
+});
+
+test('default audiences remain accepted and exported under both names', () => {
+  assert.equal(AUDIENCES, DEFAULT_AUDIENCES);
+  assert.deepEqual(DEFAULT_AUDIENCES, ['all', 'player', 'manager', 'guest', 'admin']);
+  for (const audience of DEFAULT_AUDIENCES) {
+    assert.equal(isKnownAudience(audience), true);
+    const { entry, issues } = parseEntry({
+      fileName: '2026-08-07--roles.md',
+      source: `---\nkind: feature\ndate: 2026-08-07\ntitle: Roles\naudience: ${audience}\n---\nBody\n`,
+      config: CONFIG,
+    });
+    assert.equal(entry?.audience, audience);
+    assert.deepEqual(issues, []);
+  }
+  assert.equal(isKnownAudience('trainer'), false);
+});
+
+test('configured audiences replace defaults but always accept all', () => {
+  const config = { ...CONFIG, audiences: ['trainer', 'client'] };
+  for (const audience of ['trainer', 'client', 'all', 'player']) {
+    const { entry, issues } = parseEntry({
+      fileName: '2026-08-07--roles.md',
+      source: `---\nkind: feature\ndate: 2026-08-07\ntitle: Roles\naudience: ${audience}\n---\nBody\n`,
+      config,
+    });
+    assert.equal(entry?.audience, audience === 'player' ? 'all' : audience);
+    assert.equal(isKnownAudience(audience, config.audiences), audience !== 'player');
+    assert.deepEqual(issues, audience === 'player' ? [{
+      level: 'warn',
+      message: 'Unknown audience "player" (expected one of all, trainer, client; falling back to "all")',
+    }] : []);
+  }
 });
 
 test('slugify and entryFileName produce stable file names', () => {

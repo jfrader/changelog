@@ -5,7 +5,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { parseFrontmatter } from './frontmatter.js';
 import {
-  AUDIENCES,
+  DEFAULT_AUDIENCES,
   KIND_ORDER,
   type ChangelogConfig,
   type ChangelogEntry,
@@ -19,8 +19,24 @@ export function isKnownKind(value: unknown): value is ChangelogKind {
   return typeof value === 'string' && (KIND_ORDER as readonly string[]).includes(value);
 }
 
-export function isKnownAudience(value: unknown): value is ChangelogAudience {
-  return typeof value === 'string' && (AUDIENCES as readonly string[]).includes(value);
+export function isKnownAudience(
+  value: unknown,
+  audiences: readonly string[] = DEFAULT_AUDIENCES,
+): value is ChangelogAudience {
+  return typeof value === 'string' && (value === 'all' || audiences.includes(value));
+}
+
+export function resolveAudience(
+  value: unknown,
+  audiences: readonly string[] = DEFAULT_AUDIENCES,
+): { audience: ChangelogAudience; warning?: string } {
+  if (value === undefined) return { audience: 'all' };
+  if (isKnownAudience(value, audiences)) return { audience: value };
+  const accepted = [...new Set(['all', ...audiences])];
+  return {
+    audience: 'all',
+    warning: `Unknown audience "${String(value)}" (expected one of ${accepted.join(', ')}; falling back to "all")`,
+  };
 }
 
 export function slugify(input: string): string {
@@ -125,13 +141,8 @@ export function parseEntry(input: ParseEntryInput): {
     issues.push({ level: 'error', message: `Invalid date "${date}" (expected YYYY-MM-DD)` });
   }
 
-  const audience = frontmatter['audience'] as unknown;
-  if (audience !== undefined && !isKnownAudience(audience)) {
-    issues.push({
-      level: 'warn',
-      message: `Unknown audience "${String(audience)}" (falling back to "all")`,
-    });
-  }
+  const { audience, warning } = resolveAudience(frontmatter['audience'], input.config.audiences);
+  if (warning) issues.push({ level: 'warn', message: warning });
 
   const published = frontmatter['published'] === undefined ? true : frontmatter['published'] !== false;
 
@@ -216,7 +227,7 @@ export function parseEntry(input: ParseEntryInput): {
     productName: input.config.productName,
     version: typeof frontmatter['version'] === 'string' ? frontmatter['version'] : undefined,
     tags,
-    audience: isKnownAudience(audience) ? audience : 'all',
+    audience,
     published,
     fileName: input.fileName,
     relPath: path.join('entries', input.fileName),

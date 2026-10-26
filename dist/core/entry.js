@@ -4,13 +4,24 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { parseFrontmatter } from './frontmatter.js';
-import { AUDIENCES, KIND_ORDER, } from './types.js';
+import { DEFAULT_AUDIENCES, KIND_ORDER, } from './types.js';
 export const ENTRY_PATTERN = /^(\d{4}-\d{2}-\d{2})--(.+)\.md$/;
 export function isKnownKind(value) {
     return typeof value === 'string' && KIND_ORDER.includes(value);
 }
-export function isKnownAudience(value) {
-    return typeof value === 'string' && AUDIENCES.includes(value);
+export function isKnownAudience(value, audiences = DEFAULT_AUDIENCES) {
+    return typeof value === 'string' && (value === 'all' || audiences.includes(value));
+}
+export function resolveAudience(value, audiences = DEFAULT_AUDIENCES) {
+    if (value === undefined)
+        return { audience: 'all' };
+    if (isKnownAudience(value, audiences))
+        return { audience: value };
+    const accepted = [...new Set(['all', ...audiences])];
+    return {
+        audience: 'all',
+        warning: `Unknown audience "${String(value)}" (expected one of ${accepted.join(', ')}; falling back to "all")`,
+    };
 }
 export function slugify(input) {
     return input
@@ -94,13 +105,9 @@ export function parseEntry(input) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) {
         issues.push({ level: 'error', message: `Invalid date "${date}" (expected YYYY-MM-DD)` });
     }
-    const audience = frontmatter['audience'];
-    if (audience !== undefined && !isKnownAudience(audience)) {
-        issues.push({
-            level: 'warn',
-            message: `Unknown audience "${String(audience)}" (falling back to "all")`,
-        });
-    }
+    const { audience, warning } = resolveAudience(frontmatter['audience'], input.config.audiences);
+    if (warning)
+        issues.push({ level: 'warn', message: warning });
     const published = frontmatter['published'] === undefined ? true : frontmatter['published'] !== false;
     // --- i18n: resolve per-language titles and bodies ---
     const configLanguages = input.config.languages;
@@ -178,7 +185,7 @@ export function parseEntry(input) {
         productName: input.config.productName,
         version: typeof frontmatter['version'] === 'string' ? frontmatter['version'] : undefined,
         tags,
-        audience: isKnownAudience(audience) ? audience : 'all',
+        audience,
         published,
         fileName: input.fileName,
         relPath: path.join('entries', input.fileName),
