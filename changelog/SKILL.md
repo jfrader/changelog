@@ -31,6 +31,14 @@ entry. When in doubt, leave it out — a missing entry is a non-event; a junk
 entry misleads users. Exceptions require an explicit user request to log an
 internal change. Never invent an entry.
 
+## Where history lives
+
+- A repo using this package keeps entries in `changelog/entries/` and builds
+  `changelog/CHANGELOG.md`.
+- A repo without the package keeps a root `CHANGELOG.md` (create it if missing).
+- Never append dated history to `AGENTS.md`, `README.md` or architecture docs.
+  Rewrite the standing fact and point at the changelog for the timeline.
+
 ## Choose the kind
 
 Choose from the user's point of view. `kind` controls the category shown in
